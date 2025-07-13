@@ -1,0 +1,34 @@
+[project]
+name = "deds"
+dynamic = ["version"]
+authors = [
+  { name="Rollen S. D'Souza", email="rollensdsouza@gmail.com" },
+]
+description = "A package that implements the Dynamic Extension Dynamic Search (DEDS) algorithm."
+readme = "README.md"
+requires-python = ">=3.11"
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "Operating System :: OS Independent",
+    "Development Status :: 3 - Alpha",
+    "Topic :: Scientific/Engineering :: Mathematics",
+]
+license = "BSD-3-Clause"
+license-files = ["LICEN[CS]E*"]
+dependencies = [
+    "sympy",
+]
+
+[project.urls]
+Homepage = "https://github.com/pypa/sampleproject"
+Issues = "https://github.com/pypa/sampleproject/issues"
+
+[build-system]
+requires = ["hatchling >= 1.26"]
+build-backend = "hatchling.build"
+
+[tool.hatch.version]
+source = "versioningit"
+
+[tool.hatch.build.targets.wheel]
+packages = ["source/deds"]

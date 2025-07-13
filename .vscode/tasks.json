@@ -1,0 +1,12 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "Install Package for Development",
+            "type": "shell",
+            "command": "sage --pip install --user -e ${workspaceFolder}",
+            "detail": "Installs the DEDS python package in editable mode so that you can edit the package and run code that uses it right away.",
+            "problemMatcher": []
+        }
+    ]
+}
