@@ -24,11 +24,11 @@ Homepage = "https://github.com/pypa/sampleproject"
 Issues = "https://github.com/pypa/sampleproject/issues"
 
 [build-system]
-requires = ["hatchling >= 1.26"]
-build-backend = "hatchling.build"
+requires = ["setuptools >= 77.0.3", "versioningit"]
+build-backend = "setuptools.build_meta"
 
-[tool.hatch.version]
-source = "versioningit"
+[tool.setuptools]
+packages = ["deds"]
+package-dir = {"" = "source"}
 
-[tool.hatch.build.targets.wheel]
-packages = ["source/deds"]
+[tool.versioningit]
