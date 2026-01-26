@@ -59,8 +59,22 @@ class InvalidOutputFunctionError(Exception):
     """
     pass
 
+
 class OutputHasIllDefinedRelativeDegreeError(Exception):
     """
     Error raised when an output function does not have a well-defined relative degree at the operating point.
+    """
+    pass
+
+
+class OutputHasInfiniteRelativeDegreeError(Exception):
+    """
+    Error raised when an output function is used to perform dynamic extension, but does not have finite relative degree.
+    """
+    pass
+
+class CouldNotComputeStaticFeedbackTransformationError(Exception):
+    """
+    The dynamic extension operation could not compute an inverse about the operating point required to perform a preliminary static feedback transformation.
     """
     pass

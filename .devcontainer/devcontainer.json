@@ -9,5 +9,10 @@
                 "ms-toolsai.jupyter"
             ]
         }
-    }
+    },
+    "forwardPorts": [8081],
+    "postStartCommand": [
+        "/root/miniforge3/bin/conda", "run", "--live-stream", "-n", "sage", "/bin/bash", "-c",
+        "{ nohup python3 -m http.server -d /workspaces/dfl/docs/build/html/ 8081 > /dev/null & disown %1; }"
+    ]
 }

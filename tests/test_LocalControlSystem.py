@@ -108,9 +108,9 @@ class LTIControlSystem(unittest.TestCase):
         self.assertEqual(len(system.derived_flag[2]), 1)
         self.assertEqual(len(system.derived_flag[3]), 0)
 
-        self.assertEqual(system.relative_degree_of(x), 3)
-        self.assertEqual(system.relative_degree_of(y), 2)
-        self.assertEqual(system.relative_degree_of(z), 1)
+        self.assertEqual(system.relative_degree_of_user_output(x), 3)
+        self.assertEqual(system.relative_degree_of_user_output(y), 2)
+        self.assertEqual(system.relative_degree_of_user_output(z), 1)
 
     def test_siso_controllable_bad_relative_degree(self):
         x = Symbol('x')
@@ -124,7 +124,7 @@ class LTIControlSystem(unittest.TestCase):
         system = factory.make_control_system()
 
         def bad_output_function():
-            return system.relative_degree_of(x**2, well_defined_to_order=1)
+            return system.relative_degree_of_user_output((x**2), well_defined_to_order=1)
         
         self.assertRaises(deds.OutputHasIllDefinedRelativeDegreeError, bad_output_function)
 
@@ -144,9 +144,9 @@ class LTIControlSystem(unittest.TestCase):
         self.assertEqual(len(system.derived_flag[1]), 2)
         self.assertEqual(len(system.derived_flag[2]), 1)
 
-        self.assertEqual(system.relative_degree_of(y), 2)
-        self.assertEqual(system.relative_degree_of(z), 1)
-        self.assertEqual(system.relative_degree_of(x), -1)
+        self.assertEqual(system.relative_degree_of_user_output((y)), 2)
+        self.assertEqual(system.relative_degree_of_user_output((z)), 1)
+        self.assertEqual(system.relative_degree_of_user_output((x)), -1)
 
 
 class NonlinearControlAffineSystem(unittest.TestCase):
@@ -166,8 +166,8 @@ class NonlinearControlAffineSystem(unittest.TestCase):
         self.assertEqual(len(system.derived_flag[0]), 2)
         self.assertEqual(len(system.derived_flag[1]), 0)
 
-        self.assertEqual(system.relative_degree_of(x, well_defined_to_order=2), 1)
-        self.assertEqual(system.relative_degree_of(y, well_defined_to_order=2), 1)
+        self.assertEqual(system.relative_degree_of_user_output((x), well_defined_to_order=2), 1)
+        self.assertEqual(system.relative_degree_of_user_output((y), well_defined_to_order=2), 1)
 
     def test_one_active_one_passive(self):
         x = Symbol('x')
@@ -184,5 +184,5 @@ class NonlinearControlAffineSystem(unittest.TestCase):
         self.assertEqual(len(system.derived_flag[0]), 2)
         self.assertEqual(len(system.derived_flag[1]), 0)
 
-        self.assertEqual(system.relative_degree_of(x, well_defined_to_order=2), 1)
-        self.assertEqual(system.relative_degree_of(y, well_defined_to_order=2), 1)
+        self.assertEqual(system.relative_degree_of_user_output((x), well_defined_to_order=2), 1)
+        self.assertEqual(system.relative_degree_of_user_output((y), well_defined_to_order=2), 1)

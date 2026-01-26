@@ -6,7 +6,25 @@
             "type": "shell",
             "command": "sage --pip install --user -e ${workspaceFolder}",
             "detail": "Installs the DEDS python package in editable mode so that you can edit the package and run code that uses it right away.",
-            "problemMatcher": []
+            "problemMatcher": [],
+            "hide": true
+        },
+        {
+            "label": "Run Tests",
+            "type": "shell",
+            "command": "sage --python ${workspaceFolder}/.vscode/run_tests.py",
+            "detail": "Executes the DEDS package test suite.",
+            "problemMatcher": [],
+            "dependsOn": ["Install Package for Development"],
+            "group": "test"
+        },
+        {
+            "label": "Build Documentation",
+            "type": "shell",
+            "command": "make -C ${workspaceFolder}/docs/ html",
+            "detail": "Builds/Updates HTML documentation using Sphinx.",
+            "problemMatcher": [],
+            "dependsOn": ["Install Package for Development"],
         }
     ]
 }

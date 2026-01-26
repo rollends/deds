@@ -20,7 +20,7 @@ RUN curl -L -O "https://github.com/conda-forge/miniforge/releases/latest/downloa
 
 SHELL ["/root/miniforge3/bin/conda", "run", "--live-stream", "/bin/bash", "-c"]
 
-RUN conda create -n sage sage python=3.11
+RUN conda create -n sage sage python=3.11 pytest sphinx furo
 
 SHELL ["/root/miniforge3/bin/conda", "run", "--live-stream", "-n", "sage", "/bin/bash", "-c"]
 
