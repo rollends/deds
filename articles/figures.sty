@@ -1,0 +1,73 @@
+\NeedsTeXFormat{LaTeX2e}[1994/06/01]
+\ProvidesPackage{figures}[2025/01/13 1.0.0 Rollen Figures Package]
+\RequirePackage[usenames, dvipsnames]{xcolor}
+\RequirePackage{tikz}
+
+\usetikzlibrary{arrows.meta, calc, cd, fit, positioning, decorations.pathreplacing}
+
+\tikzset{
+  system path/.style={
+    color           = Black,
+    thick,
+    line join       = round,
+    rounded corners = 0.25em,
+    shorten        >= 0.05em
+  },
+  category/.style={
+    rectangle,
+    thick,
+    draw            = Black,
+    rounded corners,
+    align           = center
+  },
+  system block/.style = {
+    rectangle,
+    thick,
+    draw            = Black,
+    fill            = White,
+    rounded corners,
+    align           = center
+  },
+  system sum/.style = {
+    circle,
+    minimum width   = 0.5em,
+    minimum height  = 0.5em,
+    thick,
+    draw            = Black,
+    fill            = White,
+  },
+  system area/.style = {
+    rectangle,
+    thick,
+    dashed,
+    draw            = Purple,
+    fill            = Purple!30!White,
+    rounded corners
+  },
+  system area text/.style = {
+    text = Purple!50!Black,
+  },
+  system area red/.style = {
+    rectangle,
+    thick,
+    dashed,
+    draw            = Red,
+    fill            = Red!30!White,
+    rounded corners
+  },
+  system area red text/.style = {
+    text            = Red!50!Black,
+  },
+  system area green/.style = {
+    rectangle,
+    thick,
+    dashed,
+    draw            = OliveGreen,
+    fill            = OliveGreen!30!White,
+    rounded corners
+  },
+  system area green text/.style = {
+    text            = OliveGreen!50!Black,
+  },
+}
+

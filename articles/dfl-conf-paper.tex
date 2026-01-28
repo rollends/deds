@@ -1,7 +1,6 @@
 \documentclass{ifacconf}
 \usepackage[T1]{fontenc}
 \pdfobjcompresslevel=0
-\pdfminorversion=4
 
 \usepackage{caption}
 \usepackage{comment}
@@ -16,18 +15,27 @@
 \begin{document}
 
 \begin{frontmatter}
+
 \title{The Dynamic Search for the Minimal Dynamic Extension}
-
 \thanks[footnoteinfo]{This project was not funded or sponsored by any institution or grant.}
-
 \author[First]{Rollen S. D'Souza} 
-
 \address[First]{e-mail: research@rollends.ca.}
 
 \begin{abstract}
+  Identifying the dynamic precompensator that renders a nonlinear control system feedback linearizable remains a challenging problem.
+  Researchers have explored the problem --- known as dynamic feedback linearizability --- over the last few decades producing existence conditions and constructive procedures for identifying and constructing the dynamic precompensator.
+  These remain, in general, either computationally expensive or restrictive.
+  Treating the challenge as intrinsic, this article proposes viewing the problem as a search problem over a category.
+  Dynamic programming applies in this category and, upon restriction to a finite category, Djikstra's or A* algorithms find the minimal dynamic extension to feedback linearizability.
+  Alternatively, a heuristic aiming towards feedback linearizable systems can be employed to select amongst the infinitely-many extensions.
+  The novel framing provides a refreshing and abstract view of the search for the dynamic precompensator.
 \end{abstract}
 
 \begin{keyword}
+  dynamic feedback linearization; dynamic extension; differential flatness; dynamic programming.\\
+  
+
+  \emph{2020 Mathematics Subject Classification}: 93C10, 93B27, 93C35
 \end{keyword}
 
 \end{frontmatter}
@@ -44,33 +52,32 @@ can be transformed into a linear control system in Brunovsk\'y normal form,
 through the use of a state (\(\xi = \phi(x)\)) and feedback transformation (\(\nu = \beta(x, u)\)) has been well-understood for decades.
 A nonlinear control system that has such a transformation is said to be (statically) feedback linearizable.
 \cite{hunt_design_1982} and~\cite{jakubczyk_linearization_1980} independently proposed the necessary and sufficient conditions for when a nonlinear control system is feedback linearizable.
-The simplicity of a linear control system permits straightforward solutions to control design problems like stabilization and tracking as well as for planning design problems like trajectory generation.
+% The simplicity of a linear control system permits straightforward solutions to control design problems like stabilization and tracking as well as for planning design problems like trajectory generation.
 Unfortunately, the class of feedback linearizable systems is small.
 Even simple, practical control systems --- such as those that model non-holonomic vehicles --- fail to be feedback linearizable.
 This motivates the now-extensive study of \emph{dynamically} feedback linearizable systems and \emph{(differentially) flat} systems.
-Dynamically feedback linearizable systems are simply those systems that, under appropriate dynamic precompensation, are feedback linearizable.
-The diagram below illustrates this concisely.
+Dynamically feedback linearizable systems are those systems that, under appropriate dynamic precompensation,
 %
 \begin{center}
   \begin{tikzpicture}[x = 1cm, y = 1cm]
 
     \node[at = {(0, 0)}] (v) {};
     \node[system block, right = 0.5 of v] (Precompensator) {%
-      \(Z^j(s) = \frac{1}{s^{\kappa^j}}\,V(s)\)%
+      \(%
+        \begin{aligned}
+          \dot{z} &= a(x, v, z)\\
+          u &= b(x, v, z)
+        \end{aligned}%
+      \)
     };
-    \node[system block, right = 0.5 of Precompensator] (FT) {%
-      \(\beta(z, x)\)%
-    };
-    \node[system block, right = 0.5 of FT] (System) {%
+    \node[system block, right = 0.5 of Precompensator] (System) {%
       \(\dot{x} = f(x, u)\)%
     };
 
     \draw[system path, - Latex]
       (v.base) node[above] {\(v\)} -- (Precompensator.west);
     \draw[system path, - Latex]
-      (Precompensator.east) --  node[above, midway] {\(z\)} (FT.west);
-    \draw[system path, - Latex]
-      (FT.east) -- node[above, midway] {\(u\)}(System.west);
+      (Precompensator.east) -- node[above, midway] {\(u\)}(System.west);
     \draw[system path, - Latex]
       (System.east) 
         -- 
@@ -79,51 +86,70 @@ The diagram below illustrates this concisely.
       +(0.2, -1)
         -|
         node[below, midway] {\(x\)}
-      (FT.south);
+      (Precompensator.south);
 
   \end{tikzpicture}
 \end{center}
 %
-A flat system is similiar in that there exists a set of output functions that, under an appropriate number of differentiations along the dynamics, eventually renders a linear dynamical system.
+are feedback linearizable.
+Flat systems are similar in that they require an equivalence between the original system \((x, u)\) and the dynamics of an output and a finite number of its derivatives.
 \cite{levine_equivalence_2007} demonstrated the equivalence between flat and dynamically feedback linearizable systems.
-Conditions upon which a system is dynamically feedback linearizable are known since the work of~\cite{guay_condition_1997}, but finding and constructing the required precompensatation remains an open problem in the field with solutions arising primarily under additional assumptions.
+Conditions upon which a system is dynamically feedback linearizable are known since the work of~\cite{guay_condition_1997}, but finding the required precompensator efficiently remains an open problem.
+% with solutions arising primarily under additional assumptions.
 % \cite{guay_condition_1997} places a bound on how large the dynamic precompensator is, but does not supply a method to find the precompensator in general.
-By restricting systems to have only two inputs,~\cite{gstottner_necessary_2023} demonstrated a method to evaluate flatness and construct the flat outputs.
-The conditions for flatness even in this restricted case are complex, suggesting that the conditions for flatness are computationally complex in general.
-This article instead surrenders to the possibility that no computationally reasonable method exists for the multi-input, dynamic feedback linearizability problem.
-In lieu of this, we take a hint from computer science where computationally expensive searches are made practical through heuristics.
-The problem of dynamic feedback linearizability must be cast as a searching problem to make this work.
+By restricting to two-input systems,~\cite{gstottner_necessary_2023} demonstrated a method to construct the flat outputs.
+The conditions for flatness even in this case are complex, suggesting that the general conditions for flatness are computationally complex.
+What if no computationally reasonable method exists for the multi-input, dynamic feedback linearizability problem?
 
-Adding differential constraints to an existing set of differential constraints  can bring the original differential system into involution, i.e. make it solvable.
-The process, known as \emph{prolongation}, was leveraged to great success by \'E. Cartan;
+Surrendering to this possibility, it is worth taking a hint from computer science where computationally expensive searches are made practical through heuristics.
+The dynamic feedback linearization problem is a type of search problem.
+Searching for differential objects to achieve some end is not new.
+The process of \emph{prolongation} was leveraged to great success by \'E. Cartan for bringing differential systems into integrability;
 see~\cite{malgrange_sur_2017} and~\cite{bryant_exterior_1991} for a thorough review.
-Adding states to a nonlinear control system that are derivatives of the input sometimes results in a system that is feedback linearizable.
+Adding states to a nonlinear control system that are derivatives of the input can result in a feedback linearizable system.
 This process is called \emph{dynamic extension} and it mirrors the prolongation step.
 When a sequence of dynamic extensions leads to a feedback linearizable system, the original system is dynamically feedback linearizable.
-The reverse is not necessarily the case as highlighted in the recent work by~\cite{nicolau_dynamic_2025} wherein a sequence of one-step prolongations is used to flatten two-input systems.
-A system that is dynamically feedback linearizable via a sequence of one-fold prolongations is in the LSOP class.
-Other authors in the literature, like~\cite{levine_differential_2025} and~\cite{battilotti_constructive_2004}, have also explored the use of these one-step prolongation to incrementally construct a flat system.
-The work by~\cite{battilotti_constructive_2004} relaxes the problem class by considering multi-input systems with any type of prolongation but has only sufficient conditions when the prolongation indices are of an order less than two.
-\cite{levine_differential_2025} also relaxes the problem to multi-input systems but only considers pure prolongations, i.e. pure derivatives of the input, in exchange for considering any prolongation order.
-They further claim to construct the minimal such sequence.
+The reverse is not necessarily the case as highlighted by~\cite{nicolau_dynamic_2025}.
+% wherein a sequence of one-step prolongations is used to flatten two-input systems.
+They classified systems that are dynamically feedback linearizable via a sequence of one-fold prolongations in the LSOP class.
+Other authors, like~\cite{levine_differential_2025-1} and~\cite{battilotti_constructive_2004}, also explored the use of these one-step prolongations.
+% to incrementally construct a flat system.
+The work by~\cite{battilotti_constructive_2004} considers multi-input systems with any type of prolongation but arrives at only sufficient conditions when the prolongation indices are not too large.
+In exchange for considering any prolongation order,~\cite{levine_differential_2025-1} searches only pure prolongations, i.e. pure derivatives of the input, and arrives at conditions for dynamic feedback linearizability.
 
-It is in this broad vein that we cast the problem of dynamic feedback linearization as a search problem:
+It is in this broad vein that dynamic feedback linearization is seen as a search problem:
 can we search the space of dynamic extensions and incrementally build the minimal dynamic extension to feedback linearizability?
-To achieve this, like~\cite{nicolau_dynamic_2025}, we too restrict the problem of dynamic feedback linearization to a subclass of the LSOP class.
-Section~\ref{section:geoemetry} presents a formal characterization of this subclass that relates the projection map from a lifted extension system down to the original system to a geometric structure that encodes the dynamic extension step.
-Equipped with a formal, geometric notion of dynamic extension, Section~\ref{section:dynamic-programming} takes a detour to discuss Bellman's Principle of Optimality and its application to mathematical categories.
+This article proposes a framing of the problem that can be used to find the minimal dynamic extension efficiently when restricted to a subclass of the LSOP class.
+Section~\ref{section:geoemetry} presents a formal characterization of this subclass which explicitly encodes the dynamic extension step.
+Section~\ref{section:dynamic-programming} then takes a detour to discuss dynamic programming and its application to mathematical categories.
 The formal subclass of systems considered forms a category where the arrows are precisely those projections tied to a dynamic extension.
 A dynamic search prunes the category of non-optimal arrows producing, as a result, a category that enumerates all the optimal arrows to the original system.
 If at least one arrow comes from a feedback linearizable system, then the system is dynamically feedback linearizable.
 Section~\ref{section:deds} puts these pieces together as-described and demonstrates the approach in part through simple examples.
 
 \section{Notation}
+If \(x\) \(\in\) \(\Reals^n,\) \(x^i\) denotes the \(i\)th component.
+Given a map \(F:\) \(\Reals^n\) \(\to\) \(\Reals^m,\) the map \(F^i:\) \(\Reals^n\) \(\to\) \(\Reals\) denotes the \(i\)th component function.
+An \(n\)-dimensional manifold \(\Manifold{M}\) \(\subset\) \(\Reals^n\) is described locally through a coordinate chart \((\OpenSet{U};\) \((x^1,\) \(\ldots,\) \(x^n))\) where \(\OpenSet{U}\) \(\subseteq\) \(\Manifold{M}\) is an open subset and \(x^1,\) \(\ldots,\) \(x^n\) are the coordinates.
+Let \(p\) \(\in\) \(\OpenSet{U}\) \(\subseteq\) \(\Manifold{M}.\)
+The tangent space \(\TangentSpace{\Manifold{M}}{p}\) at \(p\) is spanned by vectors tangent to the manifold at \(p.\)
+It can be bundled over \(\Manifold{M}\) to form the tangent bundle \(\TangentBundle{\Manifold{M}}.\)
+The cotangent space \(\CotangentSpace{\Manifold{M}}{p}\) at \(p\) is spanned by covectors (one-forms) \(dx^1_p,\) \(\ldots,\) \(dx^n_p : \TangentSpace{\Manifold{M}}{p} \to \Reals.\)
+The cotangent space can be bundled together as well to form the cotangent bundle \(\CotangentBundle{\Manifold{M}}.\)
+The set of smooth sections of the cotangent bundle is denoted \(\CoTangentSections{\Manifold{M}}\) whose elements \(X\in \CoTangentSections{\Manifold{M}}\) are precisely the smooth one-forms of \(\Manifold{M}.\)
+For \(k > 1,\) the space of \(k\)-forms at \(p\) is denoted \(\KFormSpaceAt{\Manifold{M}}{p}{k}.\)
+Smooth \(k\)-forms are constructed in the same manner as smooth one-forms.
+These combine to form the set of all smooth forms \(\FormSections{\Manifold{M}}\) on \(\Manifold{M}.\)
+Given \(\beta\) \(\in\) \(\SmoothSections{\KFormSpaceOf{\Manifold{M}}{k}},\) the exterior derivative is \(d\beta\) \(\in\) \(\SmoothSections{\KFormSpaceOf{\Manifold{M}}{k+1}}.\)
+If \(\alpha\) \(\in\) \(\SmoothSections{\KFormSpaceOf{\Manifold{M}}{\ell}},\) then \(\alpha\) \(\wedge\) \(\beta\) \(\in\) \(\SmoothSections{\KFormSpaceOf{\Manifold{M}}{k+\ell}}\) is known as their wedge product.
+Given \(\beta^1,\) \(\ldots,\) \(\beta^k \in \CoTangentSections{\Manifold{M}},\) an ideal \(\Ideal{I}\) over the (wedge product) algebra of smooth forms may be generated with the notation \(\langle \beta^1,\) \(\ldots,\) \(\beta^k \rangle\) \(\subseteq\) \(\FormSections{\Manifold{M}}.\)
+An ideal \(\Ideal{I}\) is differentially closed when \(d\omega \in \Ideal{I}\) for all \(\omega \in \Ideal{I}.\)
 
 \section{The Geometry of Dynamic Extension}
 \label{section:geoemetry}
-This section presents a novel perspective on dynamic extension that builds on the existing geometric perspective on feedback linearization theory.
-Like in~\cite{dsouza_algorithm_2023} and~\cite{guay_condition_1997}, this article takes a dual perspective on the nonlinear control system by treating the system as a set of differential constraints forming an exterior differential system.
-The notion of dynamic extension is thus viewed as the addition of novel constraints.
+A novel perspective on dynamic extension is required to formally characterize the class of systems to search.
+Like in~\cite{dsouza_algorithm_2023} and~\cite{guay_condition_1997}, this article takes a dual perspective on the control system by treating it as a set of differential constraints.
+Dynamic extension is viewed as the addition of novel constraints.
 
 \subsection{Feedback Linearization Theory}
 Let \(x \in \Manifold{X}\) \(=\) \(\Reals^n\) be the state vector of \(n\) states and \(u \in \Manifold{U}\) \(=\) \(\Reals^m\) be the control input vector of \(m\) inputs.
@@ -133,7 +159,7 @@ Suppose the dynamics of \(x\) are governed by the nonlinear control system,
   \dot{x} = f(x, u),
 \end{equation}
 where \(f: \Manifold{X}\times\Manifold{U} \to \TangentBundle{X}\) is smooth.
-Equivalently, the system may be viewed as an exterior differential system \(\Ideal{I}^{(0)}\) \(\subseteq\) \(\SmoothForms{\Manifold{M}}\) on the extended manifold \(\Manifold{M}\) \(=\) \(\Reals\) \(\times\) \(\Manifold{X}\) \(\times\) \(\Manifold{U}\) generated by a set of smooth one-forms,
+Equivalently, the system may be viewed as an exterior differential system \(\Ideal{I}^{(0)}\) \(\subseteq\) \(\FormSections{\Manifold{M}}\) on the extended manifold \(\Manifold{M}\) \(=\) \(\Reals\) \(\times\) \(\Manifold{X}\) \(\times\) \(\Manifold{U}\) generated by a set of smooth one-forms,
 %
 \begin{equation}
   \label{eqn:eds}
@@ -198,20 +224,19 @@ The definition for vector relative degree emerges naturally from Definition~\ref
   \label{def:vector-relative-degree}
   A smooth function of the state \(h = (h^1,\ldots, h^\rho): \Manifold{X} \to \Reals^\rho\) is said to have vector relative degree \((\kappa^1, \ldots, \kappa^\rho) \geq 0\) at a point \(x_0 \in \Manifold{X}\) if, on an open neighbourhood of \(x_0,\)
   \[
-    \LieDerivative{f}^{j} dh^i \wedge dx^{1,\ldots,n} = 0, \qquad 1\leq i \leq \rho, 0 \leq j < \kappa^i,
+    \LieDerivative{f}^{j} dh^i \wedge dx^{1} \wedge \cdots dx^{n} = 0, \qquad 1\leq i \leq \rho, 0 \leq j < \kappa^i,
   \]
   and, at \(x_0,\)
   \[
-    (\LieDerivative{f}^{\kappa^1} dh^1)_{x_0} \wedge \cdots \wedge (\LieDerivative{f}^{\kappa^\rho} dh^\rho)_{x_0} \wedge
-    dx^{1,\ldots,n}_{x_0} \neq 0.
+    (\LieDerivative{f}^{\kappa^1}dh^1)_{x_0} \wedge \cdots \wedge (\LieDerivative{f}^{\kappa^\rho}dh^\rho)_{x_0} \wedge
+    dx^{1}_{x_0} \wedge \cdots \wedge dx^{n}_{x_0} \neq 0.
   \]
   It is said to have \emph{uniform} vector relative degree if \(\kappa^1 = \cdots = \kappa^\rho.\)
-  \(\bullet\)\hfill
 \end{defn}
 %
 By Definition~\ref{def:vector-relative-degree}, an output \(h\) has relative degree zero if, and only if,
 \[
-    dh_{x_0} \wedge dx^{1,\ldots,n}_{x_0} \neq 0.
+    dh_{x_0} \wedge dx^{1}_{x_0} \wedge \cdots \wedge dx^{n}_{x_0} \neq 0.
 \]
 This is non-standard but has use in defining dynamic extensions:
 any dynamic extension is tied to some output of relative degree zero.
@@ -260,20 +285,21 @@ Under reasonable regularity assumptions, a system is feedback linearizable if, a
 To every output with (vector) relative degree, we may associate a zero dynamics manifold \(\Manifold{Z} = \{ x \in \Manifold{X} : h(x) = \cdots = \LieDerivative{f}^{k-1} h(x) = 0 \}\) which characterizes the dynamics of the system when the output is zeroed.
 All outputs with relative degree induce a zero dynamics manifold, but not all zero dynamics manifolds are induced by an output with relative degree.
 For this reason,~\cite{dsouza_algorithm_2023} introduced the notion of a \emph{regular} zero dynamics manifold.
-They showed certifying that some zero dynamics manifold is regular (i.e. finding the output of relative degree) may be viewed as the construction of a descending sequence of regular zero dynamics manifolds.
-Unfortunately, more structure than this is required to explore the geometry of dynamic extension.
+% They showed certifying that some zero dynamics manifold is regular (i.e. finding the output of relative degree) may be viewed as the construction of a descending sequence of regular zero dynamics manifolds.
+% Unfortunately, more structure than this is required to explore the geometry of dynamic extension.
 Instead of placing an emphasis on a single manifold, we instead consider a \emph{family} of manifolds induced by the level sets of a smooth function.
 The level sets of a smooth function \(h: \OpenSet{U} \to \Reals^\rho\) near a regular point \(x_0\) form an \emph{\((n-\rho)\)-dimensional foliation}:
-the disjoint union of \((n-\rho)\)-dimensional, immersed submanifolds of \(\OpenSet{U}\) defined by the level sets that cover the space and for which a coordinate system exists where they are ``flat''.
+the disjoint union of \((n-\rho)\)-dimensional, immersed submanifolds (leaf) of \(\OpenSet{U}\) defined by the level sets that cover the space and for which a coordinate system exists where they are ``flat''.
 Like in~\cite{dsouza_algorithm_2023}, these smooth functions are required to have vector relative degree.
-This defines a \emph{regular zero dynamics foliation}.
+This defines a regular zero dynamics foliation.
 %
 \begin{defn}[Regular Zero Dynamics Foliation]
-  A foliation \(\Foliation{Z}\) is said to be a regular zero dynamics foliation (of type \((\rho, \kappa)\)) if there exists a smooth function of the state \(h: \Manifold{X} \to \Reals^\rho\) that has vector relative degree \(\kappa\) and whose level sets are the immersed submanifolds of the foliation.
+  A foliation \(\Foliation{Z}\) is said to be a \textbf{regular zero dynamics foliation (of type \((\rho, \kappa)\))} if there exists a smooth function of the state \(h: \Manifold{X} \to \Reals^\rho\) that has vector relative degree \(\kappa\) and whose level sets are the leaves of the foliation.
 \end{defn}
-
+%
 It is straightforward to define a regular zero dynamics foliation from an output with relative degree.
 On the other hand, how do we know that an arbitrary foliation (i.e. local family of level sets) is generated by an output with relative degree?
+%
 Given \emph{any} foliation \(\Foliation{Z}\) and a regular nonlinear control system \(\Ideal{I}^{(0)}\) construct the differential ideal,
 \[
   \mathfrak{I}(\Foliation{Z})
@@ -286,9 +312,22 @@ Given \emph{any} foliation \(\Foliation{Z}\) and a regular nonlinear control sys
 \]
 To any differential ideal \(\Ideal{K}\), Frobenius's Theorem may be used to construct the associated foliation \(\mathfrak{F}(\Ideal{K})\) that generates it.
 Clearly \(\mathfrak{F}(\mathfrak{I}(\Foliation{Z})) = \Foliation{Z}\) and \(\mathfrak{I}(\mathfrak{F}(\Ideal{K})) = \Ideal{K}.\)
+Define \(\mathfrak{Z}(\Ideal{K})\) as the largest foliation where leaves are rendered invariant under the dynamics \(f\) of the system \(\Ideal{I}^{(0)}.\)
+Formally,
+\[
+  \LieDerivative{f} \left[
+    \mathfrak{I}(\mathfrak{Z}(\Ideal{K}))
+    \cap
+    \langle \Ideal{I}^{(0)}, dt \rangle
+  \right]
+  \subseteq
+    \mathfrak{I}(\mathfrak{Z}(\Ideal{K})).
+\]
+When \(\Ideal{K}\) is differentially closed, this is equivalent to computing Lie derivatives of the exact generators along \(f\) until convergence.
+
 Given a foliation \(\Foliation{Z},\) the ideal \(\mathfrak{I}(\Foliation{Z})\) can be used to identify whether or not \(\Foliation{Z}\) is a regular zero dynamics foliation.
-Asking whether \(\Foliation{Z}\) is a regular zero dynamics foliation is approximately equivalent to demanding that each and every leaf of \(\Foliation{Z}\) is simultaneously transverse feedback linearizable.
-It follows that a minor modification of the algorithm presented by~\cite{dsouza_algorithm_2023} can be executed to arrive at the outputs that define the regular zero dynamics foliation.
+Asking whether \(\Foliation{Z}\) is a regular zero dynamics foliation is approximately equivalent to demanding that each leaf of \(\Foliation{Z}\) is transverse feedback linearizable.
+A minor modification of the algorithm presented by~\cite{dsouza_algorithm_2023} produces the outputs that define the regular zero dynamics foliation.
 %
 \begin{prop}
   \label{prop:reg-zero-dyn-fol}
@@ -297,13 +336,7 @@ It follows that a minor modification of the algorithm presented by~\cite{dsouza_
     \item{
       \label{prop:reg-zero-dyn-fol:invariance}
       \(
-        \LieDerivative{f} \left[
-          \mathfrak{I}(\Foliation{Z})
-          \cap
-          \langle \Ideal{I}^{(0)}, dt \rangle
-        \right]
-        \subseteq
-          \mathfrak{I}(\Foliation{Z}),
+        \Foliation{Z} = \mathfrak{Z}(\mathfrak{I}(\Foliation{Z})),
       \)
     }
     \item{
@@ -386,16 +419,17 @@ A regular zero dynamics foliation \(\Foliation{Z}\) is said to be tower-complete
 \subsection{Extension along a Regular Zero Dynamics Foliation}
 Regular zero dynamics foliations provide enough information to define a notion of dynamic extension.
 Given a regular zero dynamics foliation of type \((\rho^0, \kappa)\), we can construct an output \(h: \Manifold{M} \to \Reals^{\rho^0}\) that has vector relative degree \(\kappa.\)
-This output defines a channel to a set of \(\rho^0\)-inputs that can be dynamically extended.
-The dynamic extension of this channel is not a pure prolongation as the derivatives of \(h\) may be driven by a nonlinear function of the input \emph{and} state.
-Write \(h = (h^1, \ldots, h^{\rho_0})\) and define virtual inputs, for every \(1\leq j \leq \rho_0,\) by setting,
+This output defines a channel to \(\rho^0\) inputs.
+The dynamic extension of this channel is not a pure prolongation:
+the derivatives of \(h\) are driven by a function of the input and state.
+Write \(h = (h^1, \ldots, h^{\rho_0})\) and define virtual inputs, for every \(1 \leq j \leq \rho_0,\) by setting,
 \[
   \LieOperator_{f}^{\kappa_j} h^j = \alpha(x, u) \asdefine
   v^j.
 \]
-Prolongation of the virtual inputs \(v^j\) thus constitutes a dynamic extension of the output \(h.\)
-This class of dynamic extensions is illustrated in Figure~\ref{fig:dsouza-dynamic-extension}.
-The dynamics of the components \(\alpha^j\) --- whose right-inverse \(u = \beta(x, z)\) is the preliminary feedback transformation --- are in Brunovsk\'y normal form.
+Prolongation of the inputs \(v^j\) constitutes a dynamic extension of the output \(h.\)
+This class of extensions is illustrated in Figure~\ref{fig:dsouza-dynamic-extension}.
+The dynamics of the components \(\alpha^j\) --- whose right-inverse \(u = \beta(x, z)\) is the preliminary feedback --- are in Brunovsk\'y normal form.
 %
 \begin{figure}
   \centering
@@ -430,12 +464,12 @@ The dynamics of the components \(\alpha^j\) --- whose right-inverse \(u = \beta(
 
   \end{tikzpicture}
   \caption{
-    A system precompensated by an output whose components are extended by \(m\) chains of integrators with lengths \(\kappa^1,\) \(\ldots,\) \(\kappa^m.\)
+    A system precompensated by an output whose components are extended by chains of integrators with lengths \(\kappa^j.\)
   }
   \label{fig:dsouza-dynamic-extension}
 \end{figure}
 %
-The formalization of this concept is an extension system: a (lifted) regular nonlinear control system which projects down in just the right way onto a (base) regular nonlinear control system.
+This concept is captured in an extension system: a (lifted) regular nonlinear control system which projects down in just the right way onto a (base) regular nonlinear control system.
 %
 \begin{defn}[Extension System]
   \label{def:extension}
@@ -454,30 +488,30 @@ The formalization of this concept is an extension system: a (lifted) regular non
       \label{def:extension:extensionmanifold}
       there exists a regular zero dynamics foliation \(\Foliation{Z}_1\) on \((\Manifold{M}_1, \Ideal{I}^{(0)}_1)\) so that
       \[
-          \langle \pi^* \SmoothForms{\Manifold{M}_1}, \mathfrak{I}(\Foliation{Z}_2), dt \rangle = \SmoothForms{\Manifold{M}_2},
+          \langle \pi^* \FormSections{\Manifold{M}_1}, \mathfrak{I}(\Foliation{Z}_2), dt \rangle = \FormSections{\Manifold{M}_2},
       \]
-      where the regular zero dynamics foliation \(\Foliation{Z}_2\) \(=\) \(\mathfrak{Z}(\pi^* \mathfrak{I}(\Foliation{Z}_1))\) on \((\Manifold{M}_2, \Ideal{I}^{(0)}_2).\) \(\bullet\)\hfill
+      where the regular zero dynamics foliation \(\Foliation{Z}_2\) \(=\) \(\mathfrak{Z}(\pi^* \mathfrak{I}(\Foliation{Z}_1))\) on \((\Manifold{M}_2, \Ideal{I}^{(0)}_2).\)
     }
   \end{enumerate}
 \end{defn}
 %
-The first condition~\ref{def:extension:constraints} demands that the constraints \(\Ideal{I}^{(0)}_1\) governing the base system's dynamics are captured in the lifted system \(\Ideal{I}^{(0)}_2\) on \(\Manifold{M}_2.\)
+The first condition~\ref{def:extension:constraints} ensures the base system's dynamics are captured in the lifted system \(\Ideal{I}^{(0)}_2\) on \(\Manifold{M}_2.\)
 % This is obvious.
 The definition's weight is carried by condition~\ref{def:extension:extensionmanifold} which enforces the existence of an output used to construct the dynamic extension:
-the output, its Lie derivatives along the base system's dynamics, and the derivatives of its virtual inputs ``cover'' the new states of the lifted system.
-The overarching goal of dynamic feedback linearization can be restated using Definition~\ref{def:extension}.
-%
-\begin{prop}
-  \label{prop:DFL-Foliation}
-  If there exists an extension system \((\Manifold{M}_2, \Ideal{I}^{(0)}_2)\) of the regular nonlinear control system \((\Manifold{M}_1, \Ideal{I}^{(0)}_1)\) where \((\Manifold{M}_2, \Ideal{I}^{(0)}_2)\) is feedback linearizable then \((\Manifold{M}_1, \Ideal{I}^{(0)}_1)\) is dynamically feedback linearizable.
-\end{prop}
+the output, its Lie derivatives along the base system's dynamics, and the derivatives of its virtual inputs ``cover'' the new states.
+% The overarching goal of dynamic feedback linearization can be restated using Definition~\ref{def:extension}.
+% %
+% \begin{prop}
+%   \label{prop:DFL-Foliation}
+%   If there exists an extension system \((\Manifold{M}_2, \Ideal{I}^{(0)}_2)\) of the regular nonlinear control system \((\Manifold{M}_1, \Ideal{I}^{(0)}_1)\) where \((\Manifold{M}_2, \Ideal{I}^{(0)}_2)\) is feedback linearizable then \((\Manifold{M}_1, \Ideal{I}^{(0)}_1)\) is dynamically feedback linearizable.
+% \end{prop}
 %
 %Note that there may exist dynamic precompensators that render the complete system feedback linearizable yet do not take the form described by Definition~\ref{def:extension}.
 Even though this class is more relaxed than the class of precompensators arrived at through pure prolongations, it retains a key property.
 %
 \begin{thm}
   \label{thm:DFL-LSOP}
-  If \((\Manifold{M}_2, \Ideal{I}^{(0)}_2)\) is an extension system of \((\Manifold{M}_1, \Ideal{I}^{(0)}_1)\) and \(\Dimension \Manifold{M}_2\) \(-\) \(\Dimension \Manifold{M}_1\) \(\geq\) \(2,\) then there exists a regular nonlinear control system \((\Manifold{M}_\bullet, \Ideal{I}^{(0)}_\bullet)\) where the diagram of extension systems below commutes.
+  If \((\Manifold{M}_2,\) \(\Ideal{I}^{(0)}_2)\) is an extension system of \((\Manifold{M}_1,\) \(\Ideal{I}^{(0)}_1)\) and \(\Dimension \Manifold{M}_2\) \(-\) \(\Dimension \Manifold{M}_1\) \(\geq\) \(2,\) then there exists a regular nonlinear control system \((\Manifold{M}_\bullet,\) \(\Ideal{I}^{(0)}_\bullet)\) where the diagram of extension systems below commutes.
   %
   \begin{center}
     \begin{tikzpicture}[x = 1cm, y = 1cm]
@@ -485,15 +519,16 @@ Even though this class is more relaxed than the class of precompensators arrived
       \node[at = {(0, 0)}] (M2) {\((\Manifold{M}_2, \Ideal{I}^{(0)}_2)\)};
       \node[right = 1 of M2] (Mp) {\((\Manifold{M}_\bullet, \Ideal{I}^{(0)}_\bullet)\)};
       \node[right = 1 of Mp] (M1) {\((\Manifold{M}_1, \Ideal{I}^{(0)}_1)\)};
-      \node[above = 0.75 of Mp] (A) {};
+      \node[above right = 0.75 of M2] (A) {};
+      \node[above left = 0.75 of M1] (B) {};
 
-      \draw[system path, - Latex]
-        (M2.east) .. controls (A) .. node[below, midway] {\(\pi\)}  (M1.west);
+      \draw[- Latex]
+        (M2.east) .. controls (A) and (B) .. node[below, midway] {\(\pi\)}  (M1.west);
 
-      \draw[system path, - Latex]
+      \draw[- Latex]
         (M2.east) -- node[below, midway] {\(\pi_\bullet\)} (Mp.west);
 
-      \draw[system path, - Latex]
+      \draw[- Latex]
         (Mp.east) -- node[below, midway] {\(\pi_1\)} (M1.west);
 
     \end{tikzpicture}
@@ -501,7 +536,7 @@ Even though this class is more relaxed than the class of precompensators arrived
 \end{thm}
 %
 \begin{pf}
-  Since \((\Manifold{M}_2, \Ideal{I}_2^{(0)})\) is an extension system of \((\Manifold{M}_1, \Ideal{I}_1^{(0)}),\) there exists a regular zero dynamics foliation \(\Foliation{Z}_1\) of type \((\rho, \kappa)\) on \(\Manifold{M}_1\) where \(\mathfrak{Z}(\pi^* \mathfrak{I}(\Foliation{Z}_1))\) produces the new states.
+  Since \((\Manifold{M}_2,\) \(\Ideal{I}_2^{(0)})\) is an extension system of \((\Manifold{M}_1,\) \(\Ideal{I}_1^{(0)}),\) there exists a regular zero dynamics foliation \(\Foliation{Z}_1\) of type \((\rho, \kappa)\) on \(\Manifold{M}_1\) where \(\mathfrak{Z}(\pi^* \mathfrak{I}(\Foliation{Z}_1))\) produces the new states.
   There also exists an output \(h: \Manifold{M}_1 \to \Reals^{\rho}\) of vector relative degree \(\kappa\) on \(\Manifold{M}_1\) whose level sets are leaves of \(\Foliation{Z}_1.\)
   Necessarily, the output \(\pi^* h: \Manifold{M}_2 \to \Reals^{\rho}\) yields a vector relative degree \(\geq \kappa\) on \(\Manifold{M}_2.\)
   This difference must be at least two.
@@ -530,11 +565,15 @@ Even though this class is more relaxed than the class of precompensators arrived
 \end{pf}
 
 A corollary of Theorem~\ref{thm:DFL-LSOP} is that any feedback linearizable system arrived at through an extension system can be feedback linearized through a sequence of one-step dynamic extensions.
-The original system is thus in the LSOP class defined by~\cite{nicolau_dynamic_2025}.
-The foliation is, in a sense, the ``natural'' choice for the given base system when searching for a dynamic extension to the feedback linearizable system.
+The original system is therefore in the LSOP class defined by~\cite{nicolau_dynamic_2025}.
+The extension system's foliation is the ``natural'' choice for finding the required dynamic extension to the feedback linearizable system.
 It is not known a-priori, however, what this natural choice is!
-We must sequentially perform dynamic extensions to incrementally construct this natural extension.
-How do we take a sequence of dynamic extensions \(\pi_1: \Manifold{M}_2 \to \Manifold{M}_1\) and \(\pi_2: \Manifold{M}_3 \to \Manifold{M}_2\) along two regular zero dynamics foliations --- \(\Foliation{Z}_1\) and \(\Foliation{Z}_2\) --- and ``combine'' them into a single dynamic extension \(\pi = \pi_1 \circ \pi_2\) along one regular zero dynamics foliation \(\Foliation{Z}\)?
+We must sequentially construct this extension through simpler dynamic extensions.
+% By Theorem~\ref{thm:DFL-LSOP}, we already know that when there exists an extension system it can be decomposed into a sequence of smaller extensions.
+% We can therefore have confidence that such a composition is well-defined if it leads to an extension system.
+% This matter is formalized later through the construction of a free category.
+
+% How do we take a sequence of dynamic extensions \(\pi_1: \Manifold{M}_2 \to \Manifold{M}_1\) and \(\pi_2: \Manifold{M}_3 \to \Manifold{M}_2\) along two regular zero dynamics foliations --- \(\Foliation{Z}_1\) and \(\Foliation{Z}_2\) --- and ``combine'' them into a single dynamic extension \(\pi = \pi_1 \circ \pi_2\) along one regular zero dynamics foliation \(\Foliation{Z}\)?
 
 \begin{comment}
 This sounds trivial.
@@ -548,10 +587,7 @@ Depicted in Figure~\ref{fig:composed-dynamic-extension} is the core issue:
 it is not clear whether a sequence of two extension systems combine to form a single extension system.
 \end{comment}
 
-This article defers the issue of determining whether \(\pi = \pi_1 \circ \pi_2\) certifies an extension system to future work.
-By Theorem~\ref{thm:DFL-LSOP}, we already know that when there exists an extension system it can be decomposed into a sequence of smaller extensions.
-We can therefore have confidence that such a composition is well-defined if it leads to an extension system.
-This matter is formalized later through the construction of a free category.
+% This article defers the issue of determining whether \(\pi = \pi_1 \circ \pi_2\) certifies an extension system to future work.
 
 \begin{comment}
 \begin{figure*}
@@ -650,20 +686,19 @@ This matter is formalized later through the construction of a free category.
 
 \section{Dynamic Programming on Categories}
 \label{section:dynamic-programming}
-Bellman introduced dynamic programming through its applications to decision theory, optimal control theory and mathematical programming.
+\cite{bellman_applications_1954} introduced dynamic programming through its applications to decision theory, optimal control theory and mathematical programming.
 The approach builds on a key principle: the principle of optimality.
+In this section, we reformulate this well-known principle into the language of categories.
 %
-\begin{prin}[Bellman's Principle of Optimality]
+\begin{prin}[Principle of Optimality]
   \label{principle:bellman}
   An optimal policy has the property that, whatever the initial state and initial decisions are, the remaining decisions must constitute an optimal policy with regard to the state resulting from the first decisions.
-  \(\bullet\)\hfill
 \end{prin}
 %
-In this section, we reformulate this principle into the language of categories.
 
 \subsection{The Optimal Arrow}
 A category \(\Category{X}\) is defined by a set of objects \(\ObjectClass_{\Category{X}}\) and a set of arrows \(\ArrowClass_{\Category{X}}\) that start and end at objects.
-The arrows must satisfy the property that they can be composed with one another, and that this composition is associative.
+The arrows must be composable and their composition must be associative.
 The identity arrow brings an object to itself.
 Composite arrows are arrows that are composed of other non-identity arrows.
 Primitive arrows are not composite.
@@ -705,7 +740,8 @@ The category formed in this manner --- building from more primitive arrows and c
 In this problem, the goal is to find the object \(a\) in the goal category \(\Category{G}\) that has the minimum arrow to our fixed object \(b.\)
 An optimal arrow \(h^*\) may not exist even when \(\HomSet(a, b)\) is non-empty:
 the minimum may not be well-defined.
-For simplicity, assume the minimum always exists when the set of arrows \(\HomSet(a, b)\) is non-empty\footnote{Demand the category be complete, and \(L\) be continuous.}.
+For simplicity, assume the minimum always exists when the set of arrows \(\HomSet(a, b)\) is non-empty.
+%\footnote{Demand the category be complete, and \(L\) be continuous.}.
 Under this assumption, the notion of optimality is well-defined.
 %
 \begin{defn}
@@ -726,10 +762,10 @@ Dynamic programming algorithms incrementally solve the problem \(\OptSet(a, b)\)
 % \begin{prob}
 %   Given an initial object \(a \in \Category{X}\) and a final object \(b \in \Category{X}\) find, if possible, an optimal arrow \(h^* \in \OptSet(a, b).\)
 % \end{prob}
-Principle~\ref{principle:bellman} does not directly apply here since there is no explicit notion of stages.
+% Principle~\ref{principle:bellman} does not directly apply since there is no explicit notion of stages.
 %: primitive arrows can take us directly to the final object from the initial object.
-The notion of composable arrows does, however, give the required information to state the principle.
-Formally, the principle can be stated simply as demanding that optimal arrows are post-composed of optimal arrows.
+%Composable arrows do, however, have the required information to state the principle.
+Principle~\ref{principle:bellman} can be restated as demanding that optimal arrows are post-composed of optimal arrows.
 %
 \begin{prin}[The Principle of Optimality]
   \label{principle:optimality}
@@ -738,21 +774,21 @@ Formally, the principle can be stated simply as demanding that optimal arrows ar
   then \(h \in \OptSet(c, b)\) is an optimal arrow.
 \end{prin}
 %
-The special case of composite arrows (if \(f\) is optimal and \(f\) is composite) need not be part of the principle.
-The contrapositive, stated in Theorem~\ref{thm:PO-Character}, does away with this.
+The special case on composite arrows is eliminated through logical manipulation as seen in Theorem~\ref{thm:PO-Character}.
 %
 \begin{thm}
   \label{thm:PO-Character}
-  Principle~\ref{principle:optimality} is equivalent to asking: if \(h \in \ArrowClass_\Category{X}\) is non-optimal, then all arrows post-composed with \(h\) are non-optimal.
+  Principle~\ref{principle:optimality} is equivalent to asking: if \(h \in \ArrowClass_\Category{X}\) is non-optimal, then all arrows of the form \(h \circ g\) for some arrow \(g \in \ArrowClass_\Category{X}\) are non-optimal.
 \end{thm}
 %
-This framing about non-optimal arrows suggests that Principle~\ref{principle:optimality} is best viewed as a method of \emph{pruning}: the stripping of non-optimal arrows when building larger optimal arrows.
+Theorem~\ref{thm:PO-Character} suggests that Principle~\ref{principle:optimality} is, without uniqueness, a method of \emph{pruning}:
+the stripping of non-optimal arrows when building larger optimal arrows.
 % \footnote{Larger here does not have a well-defined meaning, and is used simply to evoke the intuition of building on known solutions.}
 
 \subsection{Dynamic Programming}
 %This variation in the principle permits us to place the typical applications in computer science and control theory on the same footing.
 %Principle~\ref{principle:optimality} provides an initial formulation of the dynamic programming equation,
-Principle~\ref{principle:optimality} provides an initial formulation of the dynamic programming equation,
+Principle~\ref{principle:optimality} yields an initial formulation of the dynamic programming equation,
 \begin{equation}
   \label{eqn:DP}
   \min_{f \in \HomSet(a,b)} \Loss(f) 
@@ -768,12 +804,11 @@ Principle~\ref{principle:optimality} provides an initial formulation of the dyna
       }.
 \end{equation}
 %
-The dynamic programming equation~\eqref{eqn:DP} says that the optimal loss between objects \(a\) and \(b\in\Category{X}\) can be found by minimizing arrows post-composed by optimal arrows to the goal \(b.\)
+The dynamic programming equation~\eqref{eqn:DP} says that the optimal loss between objects \(a\) and \(b\in\Category{X}\) can be found by minimizing arrows composed by optimal arrows to the goal \(b.\)
 % Of course, some optimal arrows may be primitive.
 % Primitive arrows are trivially post-composed of optimal arrows (i.e. the identity arrow).
-The recursion typically associated with the dynamic programming equation is not directly apparent.
-However, the minimization can be split between the primitives to the goal and the remaining arrows to arrive at a formulation that reflects the recursive nature of dynamic programming.
-Observe that~\eqref{eqn:DP} is equivalent to,
+The recursion typically associated with the dynamic programming equation is not apparent in~\eqref{eqn:DP}.
+Split the minimization between the primitives to the goal and the remaining arrows to arrive at a formulation that reflects the recursive nature of dynamic programming:
 %
 \begin{equation}
   \label{eqn:DP-Recursive}
@@ -794,20 +829,20 @@ Observe that~\eqref{eqn:DP} is equivalent to,
         \}}}}.
 \end{equation}
 %
-The problem thus splits into two subproblems:
-a smaller optimization problem over intermediate objects, and the minimization of primitive ``shortcut'' arrows.
-This statement is known as the principle of conditional optimization and precedes the more well-known functional equation.
-The functional equation directly relates the optimal cost of a larger solution to the optimal cost of a smaller solution.
-We need an additional assumption on the loss \(L\) for this.
+Two subproblems arise in~\eqref{eqn:DP-Recursive}:
+a smaller minimization problem over intermediate objects, and the minimization of primitive ``shortcuts.''
+This is the principle of conditional optimization~\citep{sniedovich_dynamic_1992}.
+% and precedes the more well-known functional equation.
+% The functional equation directly relates the optimal cost of a larger solution to the optimal cost of a smaller solution.
+% We need an additional assumption on the loss \(L\) for this.
 
-In the path-finding problem on graphs, the loss ``splits'' over intermediate vertices.
-% This asks the loss of a composite arrow to be the sum of the individual primitive arrows in the categorical setting.
-Formally, this is a statement on the \emph{functoriality} of the loss \(L.\)
+Up until now we have been assuming the principle holds.
+It turns out that under a reasonable assumption, the principle does hold.
 Recall that \(L: \Category{X} \to \Reals\) is a functor\footnote{Endow \(\Reals\) with the additive category.} if \(L(h \circ g) = L(h) + L(g).\)
 Functoriality of the loss is a natural assumption to make:
 the loss of an action is the sum of the losses of its more primitive actions.
-Remarkably, this is all we need to establish the principle.
-
+% The principle follows directly.
+%
 \begin{thm}
   \label{thm:FunctorialLoss}
   If the loss \(L: \Category{X} \to \Reals\) is a functor, then Principle~\ref{principle:optimality} holds.
@@ -877,51 +912,106 @@ If we denote the optimal cost \(\min_{f \in \HomSet(a,b)} \Loss(f)\) by \(J^*_{L
           }
         %\right\}}}}.
 \end{equation}
-%
-The functional equation may be augmented by a cost-to-come heuristic \(H: \Category{X} \to \Reals\) which assigns a cost to an object equal to a lower-bound on the optimal cost to arrive to said object.
-The heuristic does not change the optimal arrows from a goal category \(\Category{G}\) as long as the heuristic is zero for all objects in \(\Category{G}.\)
-The heuristic-adjusted loss is,
-\[
-  L_H(a, b) \defineas L(a, b) + H(a) - H(b).
-\]
-If \(L\) is functorial then \(L_H\) is functorial.
 
-The dynamic programming algorithm produces a sequence of subcategories related by functors to the original search category.
+A dynamic programming algorithm produces a sequence of subcategories related by functors to the original category.
 At every step, the algorithm \emph{prunes} non-optimal, primitive arrows that terminate on the active set of objects.
-The sequence of categories resemble,
+It then builds optimal arrows using the composition of the remaining optimal arrows.
+The process terminates when at least one object resides in the goal category \(\Category{G}\) and all other arrows are non-optimal compared to the arrow from the goal.
+In the case where the number of arrows is finite, the algorithm reduces to Djikstra's algorithm for a shortest-path in a graph.
 %
 \begin{center}
   \begin{tikzpicture}[x = 1cm, y = 1cm]
 
     \node[at = {(0, 0)}] (A) {a};
     \node[above right = 1 of A] (B) {b};
-    \node[above = 1 of A] (C) {c};
-    \node[right = 1 of A] (D) {d};
+    \node[right = 1 of A] (C) {c};
+    \node[below right = 1 of A] (D) {d};
+    
+    \node[right = 1 of B] (E) {e};
+    \node[right = 1 of C] (F) {f};
+    \node[right = 1 of D] (G) {g};
+    
+    \node[category, fit=(A) (B) (C) (D) (E) (F) (G), ] (X1) {};
+    \node[below right=2pt of X1.north west, anchor=north west] {\(\Category{X}\)};
+    \node[category, fill=Purple, fill opacity=0.2, fit=(F) (G)] (Goal1) {};
+    \node[at = {(Goal1.base)}] {\(\Category{G}\)};
+
+    \draw[- Latex]
+      (B) -- (A);
+    \draw[- Latex]
+      (C) -- (A);
+    \draw[- Latex]
+      (D) -- (A);
     
     \draw[- Latex]
-      (B.base) -- (A.base);
+      (E) -- (B);
     \draw[- Latex]
-      (C.south) -- (A.north east);
+      (E) -- (C);
+
     \draw[- Latex]
-      (D.west) -- (A.north east);
+      (F) -- (B);
+    \draw[- Latex]
+      (F) -- (C);
+    \draw[- Latex]
+      (F) -- (D);
+
+    \draw[- Latex]
+      (G) -- (C);
+    \draw[- Latex]
+      (G) -- (D);
+
+    \node[right = 0.6 of X1] (Q) {\(\cdots\)};
+    \node[right = 0.75 of Q] (A2) {a};
+    \node[above right = 1 of A2] (B2) {b};
+    \node[right = 1 of A2] (C2) {c};
+    \node[below right = 1 of A2] (D2) {d};
+    
+    \node[right = 1 of B2] (E2) {e};
+    \node[right = 1 of C2] (F2) {f};
+    \node[right = 1 of D2] (G2) {g};
+    
+    \node[category, fit=(A2) (B2) (C2) (D2) (E2) (F2) (G2)] (X2) {};
+    \node[below right=2pt of X2.north west, anchor=north west] {\(\Category{X}\)};
+    \node[category, fill=Purple, fill opacity=0.2, fit=(F2) (G2)] (Goal2) {};
+    \node[at = {(Goal2.base)}] {\(\Category{G}\)};
+
+    \draw[- Latex]
+      (B2) -- (A2);
+    \draw[- Latex]
+      (C2) -- (A2);
+    \draw[- Latex]
+      (D2) -- (A2);
+    \draw[- Latex]
+      (E2) -- (A2);
+    \draw[- Latex, thick, red]
+      (F2) -- (A2);
+    \draw[- Latex, thick, red]
+      (G2) -- (A2);
+
+    \draw[- Latex, thick]
+      (X2) -- (Q);
+    \draw[- Latex, thick]
+      (Q)-- (X1);
+    
   \end{tikzpicture}
 \end{center}
 %
-terminating at a category containing only those optimal arrows pointing to the object of concern,
-%
-\begin{center}
-  \begin{tikzpicture}[x = 1cm, y = 1cm]
 
-    \node[at = {(0, 0)}] (M2) {\((\Manifold{M}_2, \Ideal{I}^{(0)}_2)\)};
-    \node[right = 1 of M2] (Mp) {\((\Manifold{M}_\bullet, \Ideal{I}^{(0)}_\bullet)\)};
-    \node[right = 1 of Mp] (M1) {\((\Manifold{M}_1, \Ideal{I}^{(0)}_1)\)};
-    \node[above = 0.75 of Mp] (A) {};
+Dynamic programming can be augmented by a cost-to-come heuristic \(H: \Category{X} \to \Reals\) which assigns a cost to an object placing a lower-bound on the optimal cost to arrive to said object.
+The heuristic does not change the optimal arrows from a goal category \(\Category{G}\) as long as the heuristic is zero for all objects in \(\Category{G}.\)
+The heuristic's effect on the algorithm is accounted for through the heuristic-adjusted loss,
+\[
+  L_H(a, b) \defineas L(a, b) + H(a) - H(b).
+\]
+which is functorial if \(L\) is functorial.
+Principle~\ref{principle:optimality} remains valid.
+In the case where the number of arrows is finite, heuristic-adjusted loss recovers a variant of the \(\text{A}^*\) algorithm.
 
-
-  \end{tikzpicture}
-\end{center}
-%
-If at least one arrow begins at the goal category \(\Category{G},\) then the optimal arrow from \(\Category{G}\) exists.
+The category of regular nonlinear control systems is not finite:
+the number of arrows into a system is infinite.
+The number of arrows to any given system can be made finite through restriction such as when~\cite{levine_differential_2025-1} considers only pure prolongations.
+In this case, either Djikstra's algorithm or the \(\text{A}^*\) algorithm apply directly to arrive at a minimal dynamic extension up to a maximum order.
+The bounds computed by~\cite{guay_condition_1997} can be used to make this algorithm finite.
 
 \section{Minimal Dynamic Extension through Dynamic Search}
 \label{section:deds}
@@ -942,6 +1032,7 @@ Define the loss,
     \pi \mapsto \Dimension\Manifold{M}_2 - \Dimension\Manifold{M}_1,
 \]
 for any arrow \(\pi \in \ArrowClass_{\Category{X}}\) between a system \((\Manifold{M}_1, \Ideal{I}_1),\) and its extension system \((\Manifold{M}_2, \Ideal{I}_2).\)
+\begin{comment}
 Alternatively, recall that Definition~\ref{def:extension} implies the existence of regular zero dynamics foliations \(\Foliation{Z}_2\) on \((\Manifold{M}_2, \Ideal{I}_2)\) and \(\Foliation{Z}_1\) on \((\Manifold{M}_2, \Ideal{I}_2).\)Moreover, Definition~\ref{def:extension}~\ref{def:extension:extensionmanifold} states that the new states are entirely contained in the codimension of the foliation \(\Foliation{Z}_2.\)
 This means that,
 \[
@@ -951,14 +1042,12 @@ This means that,
     =
       \Dimension \mathfrak{I}(\Foliation{Z}_2) - \Dimension \mathfrak{I}(\Foliation{Z}_1).
 \]
-Thus, \(L(\pi)\) measures the change in the system order induced by dynamic extension.
-Clearly, \(L(\pi) = 1\) for primitive arrows and \(L\) is zero for identity arrows.
-The loss \(L\) is functorial.
+\end{comment}
+The loss measures the change in the system order induced by dynamic extension.
+Clearly, \(L(\pi) = 1\) for primitive arrows and is zero for the identity arrow.
+The loss is functorial.
 It follows by Theorem~\ref{thm:FunctorialLoss} that Principle~\ref{principle:optimality} holds.
-The functional equation~\eqref{eqn:DP-Classic} determines a recursive relationship between the minimal dynamic extension and any two regular nonlinear control systems.
-
-Recalling Proposition~\ref{prop:DFL-Foliation}, we see that if there exists an arrow from some feedback linearizable system to the system \((\Manifold{M}, \Ideal{I}^{(0)})\) then it is dynamically feedback linearizable.
-The search can be performed by recursively applying~\eqref{eqn:DP-Classic} however.
+The search for a dynamic extension to a feedback linearizable system can be performed by recursively applying~\eqref{eqn:DP-Classic}.
 To accelerate the search, we introduce a cost-to-come heuristic.
 
 \subsection{The Leading Integrability Defect Heuristic}
@@ -966,34 +1055,80 @@ Although we cannot compute the loss between a nonlinear control system \((\Manif
 To construct the heuristic, we need a measure of how far away an ideal is from involution.
 %
 \begin{defn}[Integrability Defect]
-  Let \(\Ideal{I} \subseteq \SmoothForms{M}\) be an ideal. 
-  The \emph{integrability defect} \(\Defect(\Ideal{I})\) is defined as
+  Let \(\Ideal{I} \subseteq \FormSections{M}\) be an ideal. 
+  The \textbf{integrability defect} \(\Defect(\Ideal{I})\) is defined as
   \(
     \Defect(\Ideal{I})
       \defineas 
         \Dimension(\Ideal{I} / \Ideal{I}^{(1)}).
   \)
-  \(\bullet\)\hfill
 \end{defn}
 %
 The \(\Defect(\langle \Ideal{I}^{(k)}, dt \rangle)\) measures the dimension of the space of forms that fail to close under exterior derivative and thus acts as an obstruction to the integrability condition.
 This motivates a heuristic.
 %
 \begin{defn}[Leading Integrability Defect]
-  Let \((M, \Ideal{I}^{(0)})\) be a regular nonlinear control system.
-  The \emph{leading integrability defect} \(\Lid(M, \Ideal{I}^{(0)})\) is defined in the following way.
-  Find the smallest index \(k^\star \geq 0\) where \(\langle \Ideal{I}^{(k^\star)}, dt \rangle\) fails to be integrable.
+  \hfill\\Let \((\Manifold{M},\) \(\Ideal{I}^{(0)})\) be a regular nonlinear control system.
+  The \textbf{leading integrability defect} \(\Lid(\Manifold{M}, \Ideal{I}^{(0)})\) is defined in the following way.
+  Find the smallest index \(k^\star\) \(\geq\) \(0\) where \(\langle \Ideal{I}^{(k^\star)},\) \(dt \rangle\) fails to be integrable.
   If all the ideals are integrable, set \(k^\star = 0.\)
   Define,
   \(
-    \Lid(M, \Ideal{I}^{(0)}) \defineas \Defect(\langle \Ideal{I}^{(k^\star)}, dt \rangle).
+    \Lid(\Manifold{M}, \Ideal{I}^{(0)})
   \)
-  \(\bullet\)\hfill
+  \(\defineas\)
+  \(
+    \Defect(\langle \Ideal{I}^{(k^\star)}, dt \rangle).
+  \)
 \end{defn}
 %
-The \(\Lid(\cdot)\) is zero for feedback linearizable systems because of~\eqref{eqn:involutivity}.
+The \(\Lid(\cdot)\) is zero (and only zero) for feedback linearizable systems because of~\eqref{eqn:involutivity}.
 For dynamically feedback linearizable systems, the \(\Lid(\cdot)\) puts a best-case, lower-bound on how many dynamic extensions must occur to bring the system into linearizability.
-It is best to see, by way of example, how this works in practice.
+
+Finding an extension that minimizes \(\Lid(\cdot)\) is tricky because, when integrability is achieved on an ideal \(k,\) the defect may spike in the ideal \(k+1.\)
+Nevertheless, eliminating the defect in a fixed ideal still often minimizes the leading defect.
+Let \(k^\star > 0\) be the index for \(\Lid(\Manifold{M}, \Ideal{I}^{(0)}).\) 
+Take \(\sigma \in \langle \Ideal{I}^{k^\star}, dt \rangle\) to be the form that is a wedge product of all the generators of the defective ideal.
+The ideal fails~\eqref{eqn:involutivity}, i.e.,
+\(
+  \langle \Ideal{I}^{k^\star}, dt \rangle
+\)
+\(\not\subseteq\)
+\(
+  \langle \Ideal{I}^{k^\star}, dt \rangle^{(\infty)},
+\)
+and we can identify generators,
+\[ 
+  \frac{\langle \Ideal{I}^{k^\star}, dt \rangle}{\langle \Ideal{I}^{k^\star}, dt \rangle^{(1)}}
+    = \left\langle [\omega^1], \ldots, [\omega^r] \right\rangle.
+\]
+Necessarily \(d\omega^i \wedge \sigma \neq 0.\)
+Let the rank \(q^i\) be the smallest integer where \((d\omega^i)^{q^i+1} \wedge\omega^i = 0.\)
+We seek to find the smallest set \(V = \{dv^1, \ldots, dv^\ell\}\) that solves,
+\[
+  \begin{array}{cc}
+    \min_{%
+      V \subseteq \langle \Ideal{I}^{(k^\star - 1)}, dt\rangle
+    } 
+      \;& \ell\\
+    \text{s.t.}
+      \;& 
+      (d\omega^1)^{q^1} \wedge \sigma \wedge dv^{1} \wedge \cdots \wedge dv^{\ell} = 0\\
+      \;&\vdots\\
+      \;&
+      (d\omega^r)^{q^r} \wedge \sigma \wedge dv^{1} \wedge \cdots \wedge dv^{\ell} = 0
+  \end{array}
+\]
+That is, find the smallest number of exact forms in the preceding ideal (which is integrable by~\eqref{eqn:involutivity} that, if prolonged into the defective ideal, will render the forms \(\omega^i\) differentially closed.
+The problem bears resemblance to the hitting set problem which is NP-complete.
+Solving this problem identifies the key outputs \(v^i\) to dynamically extend \emph{exactly once} to bring the ideal 
+\(
+  \langle \Ideal{I}^{k^\star}, dt \rangle
+\)
+into involution.
+
+The aforementioned loss \(L\) can be adjusted with the heuristic \(H \defineas \Lid\) to arrive at a functorial loss \(L_H\) which guides the search for a minimal dynamic extension to a feedback linearizable system.
+Let us turn to a few, sipmle examples to see the heuristic in action.
 
 \subsection{Example: A First-Order Dynamic Precompensator}
 Define the manifold \(\Manifold{M}\) \(=\) \(\Reals\) \(\times\) \(\Reals^4\) \(\times\) \(\Reals^6\) with input vector \(u \in \Reals^4\) and states \((x,y,z,\theta,z,w,\beta) \in \Reals^6.\)
@@ -1017,37 +1152,41 @@ Consider the nonlinear control system,
 The system is not feedback linearizable.
 Moreover, there does not exist even a fourth-order dynamic precompensator arrived at through pure prolongations that results in a feedback linearizable system.
 A fifth-order dynamic precompensator exists: prolong \(u^2\) once and \((u^3, u^4)\) twice each.
-This can be arrived at using a dynamic programming algorithm that only searches the space of pure prolongations as documented by~\ref{levine_differential_2025}.
-We now show that there exists a first-order dynamic precompensatator that brings the system into involution.
+This can be arrived at using a dynamic programming algorithm that only searches the space of pure prolongations.
+We now show that there exists a first-order dynamic precompensator that brings the system into involution.
 
-The first application of the heuristic-adjusted, dynamic programming equation for this problem involves merely selecting the amongst the optimal primitive arrow to \((\Manifold{M}, \Ideal{I}^{(0)}).\)
+The first application of the heuristic-adjusted, dynamic programming equation for this problem involves selecting the amongst the optimal primitive arrow to \((\Manifold{M}, \Ideal{I}^{(0)}).\)
 The heuristic-adjusted loss is
 \[
     L(\pi_1) = 1 + \Lid(\Manifold{M}_2, \Ideal{I}^{(0)}_2) - \Lid(\Manifold{M}, \Ideal{I}^{(0)}).
-\]   
+\]
 The loss is minimized by selecting the nonlinear control system that is only one-dimension larger but reduces the leading integrability defect.
-In this case, the leading defect occurs at \(\langle \Ideal{I}^{(1)}, dt\rangle\) and is caused by the forms,
+In this case, the leading defect occurs at \(\langle \Ideal{I}^{(1)}, dt\rangle\) where the quotient \(\langle \Ideal{I}^{(1)}, dt\rangle\) with \(\langle \Ideal{I}^{(1)}, dt\rangle^{(1)}\) is generated by forms,
 \[
   dx - \cot(\gamma) dy,
   dz - \cot(\alpha) dw.
 \]
 The \(\Lid(\Manifold{M}, \Ideal{I}^{(0)}) = 2.\)
-If possible, we want to find a single, exact one-form to dynamically extend once that eliminates both of these terms to result in a system that has no defect.
-The exact one-form \(d\gamma\) lives in \(\langle \Ideal{I}^{(0)}, dt \rangle\) and is a candidate for bringing the two other forms into closure.
-Since \(\gamma\) has relative degree, we can perform a one-step dynamic extension along its regular zero dynamics foliation resulting in the addition of the differential constraint,
-\[
+If possible, we want to find an exact one-form to extend once that eliminates both of these terms that may result in a system that has no defect.
+Prolonging an exact form in \(\langle \Ideal{I}^{(0)}, dt \rangle\) to \(\langle \Ideal{I}^{(1)}, dt\rangle\) involves extending a virtual input once.
+The exact one-form \(d\gamma\) \(\in\) \(\langle \Ideal{I}^{(0)}, dt \rangle\) is a candidate for bringing the two other forms into closure.
+Using Definition~\ref{def:vector-relative-degree}, determine that \(\gamma\) has relative degree one.
+Perform a one-step dynamic extension along its regular zero dynamics foliation to produce the new differential constraint,
+\begin{equation}
+  \label{eqn:ex:1:constraint}
   \scalebox{0.8}{\mbox{\ensuremath{\displaystyle%
   \begin{aligned}
-    -u^3 e^{u^4} \sin\alpha d\alpha 
-    &+ du^2
-    + (u^4 e^{u^3} + e^{u^4}\cos\alpha) du^3 \\
-    &+ (e^{u^3} + u^3 e^{u^4}\cos\alpha) du^4
-    - q {dt},
+    d\LieDerivative{f}\gamma - \LieDerivative{f}^2\gamma dt
+      &= - u^3 e^{u^4} \sin\alpha d\alpha + du^2\\
+      &+ (u^4 e^{u^3} + e^{u^4}\cos\alpha) du^3\\
+      &+ (e^{u^3} + u^3 e^{u^4}\cos\alpha) du^4\\
+      &- q {dt},
   \end{aligned}
   }}}.
-\]
-A virtual input can replace \(u^2\) to formally create a virtual input that is extended to form the new input \(q.\)
-This extended system satisfies the feedback linearizability conditions.
+\end{equation}
+A virtual input can replace \(u^2\) and be extended to form the new input \(q.\)
+This defines a new manifold with additional coordinate \(q\) and the constraint~\eqref{eqn:ex:1:constraint}.
+This extended system satisfies the feedback linearizability conditions~\eqref{eqn:involutivity} and~\eqref{eqn:controllability}.
 The dynamic programming algorithm terminates since any other extensions necessarily have a larger cost.
 
 \subsection{Example: A Second-Order Dynamic Precompensator}
@@ -1075,7 +1214,7 @@ Like in the previous example, the heuristic-adjusted loss is
     L(\pi_1) = 1 + \Lid(\Manifold{M}_2, \Ideal{I}^{(0)}_2) - \Lid(\Manifold{M}, \Ideal{I}^{(0)}).
 \]   
 Unlike the previous example, however, there is no way to reduce the integrability defect immediately by an one-step extension.
-To see why, note that the first obstruction to integrability are the forms,
+The first obstruction to integrability are the forms,
 \[
     dx - \cot(\theta + z) dy, dz - \cot\beta dw,
 \]
@@ -1088,9 +1227,17 @@ These ideals have no common exact one-form.
 Any dynamic extension that brings this ideal into involution must involve a two-step extension.
 We can begin with an extension of along \(\theta + z\) and then subsequently add an extension of \(z.\)
 Together, the extensions result in a feedback linearizable system.
-The combined extension \((\theta + z, z)\) forms a regular zero dynamics foliation (in an open neighbourhood where \(\beta \neq 0\)).
+The combined extension \((\theta + z, z)\) forms a regular zero dynamics foliation.
 
 \section{Conclusion}
+Assuming the inevitable computational wall for dynamic feedback linearization, we prepare a heuristic approach to dynamically extend a system into involution.
+The approach builds on existing literature on algorithmic feedback linearization leveraging the structure of regular zero dynamics manifolds to characterize a category of nonlinear control systems to search.
+The search can be made finite by restricting the category.
+Otherwise, a heuristic may be used to guide the search and select arrows that are likely to arrive from a feedback linearizable system.
+This formulation raises a number of interesting questions.
+Is there a way to form equivalence classes of arrows to render the search finite in general?
+If not, is it possible to identify and prove the optimal heuristic and systematically generate a sequence of \emph{systems of} linear PDEs through the functional equation?
+The presented approach also lends itself to other interesting problems, like identifying a minimal dynamic extension to turn a zero dynamics manifold into a regular zero dynamics manifold, i.e. ``dynamic'' transverse feedback linearization.
 
 \bibliography{dflconfbib}
 

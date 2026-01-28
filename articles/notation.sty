@@ -1,0 +1,66 @@
+\NeedsTeXFormat{LaTeX2e}[1994/06/01]
+\ProvidesPackage{notation}[2025/07/06 1.0.0 Rollen Notation Package]
+\RequirePackage{amsmath}
+\RequirePackage{amsfonts}
+\RequirePackage{amsbsy}
+\RequirePackage{amssymb}
+\RequirePackage{euler}
+\RequirePackage{eufrak}
+\RequirePackage{euscript}
+\RequirePackage{mathtools}
+
+\DeclareMathOperator{\Dimension}{dim}
+\DeclareMathOperator{\Kernel}{ker}
+\DeclareMathOperator{\Image}{im}
+\DeclareMathOperator{\LieOperator}{\mathcal{L}}
+\DeclareMathOperator{\Defect}{defect}
+\DeclareMathOperator{\Lid}{lid}
+
+\newcommand{\asdefined}[0]{\eqqcolon}
+\newcommand{\definedas}[0]{\coloneqq}
+
+\newcommand{\Reals}[0]{\mathbb{R}}
+\newcommand{\Naturals}[0]{\mathbb{N}}
+\newcommand{\Integers}[0]{\mathbb{Z}}
+\newcommand{\NonNegativeIntegers}[0]{\mathbb{Z}_{\geq 0}}
+
+\newcommand{\Manifold}[1]{\mathsf{#1}}
+\newcommand{\Foliation}[1]{\mathscr{#1}}
+\newcommand{\OpenSet}[1]{\Manifold{#1}}
+\newcommand{\TangentSpace}[2]{\mathsf{T}_{#2}\Manifold{#1}}
+\newcommand{\CotangentSpace}[2]{\mathsf{T}^*_{#2}\Manifold{#1}}
+\newcommand{\TangentBundle}[1]{\mathsf{T}\Manifold{#1}}
+\newcommand{\CotangentBundle}[1]{\mathsf{T}^*\Manifold{#1}}
+\newcommand{\SmoothSections}[1]{\Gamma(#1)}
+\newcommand{\AlternatingAlgebra}[1]{\Lambda {#1}}
+% \newcommand{\SmoothVectorFields}[1]{\SmoothSections{\TangentBundle{#1}}}
+% \newcommand{\SmoothForms}[1]{\SmoothSections{\AlternatingAlgebra{\CotangentBundle{#1}}}}
+
+\newcommand{\KFormSpaceAt}[3]{\Lambda^{#3}\CotangentSpace{#1}{#2}}
+\newcommand{\KFormSpaceOf}[2]{\Lambda^{#2}\CotangentBundle{#1}}
+\newcommand{\FormSpaceOf}[1]{\Lambda\CotangentBundle{#1}}
+
+\newcommand{\TangentSections}[1]{\SmoothSections{\TangentBundle{#1}}}
+\newcommand{\CoTangentSections}[1]{\SmoothSections{\CotangentBundle{#1}}}
+\newcommand{\FormSections}[1]{\SmoothSections{\FormSpaceOf{#1}}}
+
+
+\newcommand{\LieDerivative}[1]{\LieOperator_{#1}}
+\newcommand{\Derivation}[1]{\partial_{#1}}
+
+\newcommand{\VectorSpace}[1]{\mathcal{#1}}
+\newcommand{\Algebra}[1]{\mathcal{#1}}
+\newcommand{\Ideal}[1]{\mathcal{#1}}
+
+\newcommand{\defineas}{\coloneq}
+\newcommand{\asdefine}{\eqcolon}
+
+\newcommand{\Loss}[0]{{L}}
+\newcommand{\PrimSet}[0]{\mathrm{prim}}
+\newcommand{\HomSet}[0]{\mathrm{hom}}
+\newcommand{\OptSet}[0]{\mathrm{opt}}
+\newcommand{\Category}[1]{\mathcal{#1}}
+\newcommand{\ObjectClass}[0]{\mathrm{Obj}}
+\newcommand{\ArrowClass}[0]{\mathrm{Arr}}
+
+\endinput
