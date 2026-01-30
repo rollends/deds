@@ -1,7 +1,7 @@
 FROM debian:12
 
 RUN apt-get update &&\
-    apt-get install -y build-essential curl locales git hunspell \
+    apt-get install -y build-essential curl locales git hunspell hunspell-en-ca \
         imagemagick python3 python3-pip python3-venv texlive-full &&\
     localedef -i en_CA -c -f UTF-8 -A /usr/share/locale/locale.alias \
         en_CA.UTF-8 &&\

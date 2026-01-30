@@ -37,7 +37,7 @@ dfl-conf-paper.pdf: dfl-conf-paper.tex $(DFLCONFPAPERDEPENDS)
 	cp $(BUILDDIRECTORY)/$@/$@ $@
 
 
-spellcheck: spellcheck-dfl-paper
+spellcheck: spellcheck-dfl-conf-paper
 
 
 spellcheck-%: %.tex
