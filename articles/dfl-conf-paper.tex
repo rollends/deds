@@ -6,7 +6,6 @@
 \usepackage{enumitem}
 \usepackage{natbib}
 \usepackage{notation}
-\usepackage{subcaption}
 
 \usepackage{figures}
 \newcommand{\defining}[1]{\textbf{#1}}
@@ -271,7 +270,7 @@ For this reason,~\cite{dsouza_algorithm_2023} introduced the notion of a \emph{r
 % Unfortunately, more structure than this is required to explore the geometry of dynamic extension.
 Instead of placing an emphasis on a single manifold, we instead consider a \emph{family} of manifolds induced by the level sets of a smooth function.
 The level sets of a smooth function \(h: \OpenSet{U} \to \Reals^\rho\) near a regular point \(x_0\) form an \emph{\((n-\rho)\)-dimensional foliation}:
-the disjoint union of \((n-\rho)\)-dimensional, immersed submanifolds (leaf) of \(\OpenSet{U}\) that cover the space and for which a coordinate system exists where they are ``flat''.
+the disjoint union of \((n-\rho)\)-dimensional, immersed submanifolds (leaf) of \(\OpenSet{U}\) that cover the space and for which a coordinate system exists where they are ``flat''~\citep[pp. 501]{lee_introduction_2012}.
 Like in~\cite{dsouza_algorithm_2023}, these smooth functions are required to have vector relative degree.
 This defines a regular zero dynamics foliation.
 %
@@ -292,7 +291,7 @@ Given \emph{any} foliation \(\Foliation{Z},\) we can construct the differential 
         \left.\omega\right|_\Manifold{N} = 0, \forall \Manifold{N} \in \Foliation{Z}
       \}.
 \]
-To any differential ideal \(\Ideal{K}\), Frobenius's Theorem may be used to construct the foliation \(\mathfrak{F}(\Ideal{K})\) that generates it.
+To any differential ideal \(\Ideal{K}\), Frobenius's Theorem may be used to construct the foliation \(\mathfrak{F}(\Ideal{K})\) that generates it~\citep{bryant_exterior_1991}.
 Clearly \(\mathfrak{F}(\mathfrak{I}(\Foliation{Z})) = \Foliation{Z}\) and \(\mathfrak{I}(\mathfrak{F}(\Ideal{K})) = \Ideal{K}.\)
 Given any two foliations \(\Foliation{Z}_1\) and \(\Foliation{Z}_2\), define their \emph{meet} by,
 %
@@ -1161,7 +1160,7 @@ The loss function may also be modified to encode design constraints on the dynam
     \langle dh^1, \ldots, \LieOperator_{f}^{\kappa^1 - \rho^{\kappa^2}} dh^{\rho^{\kappa^1}}, dq^1, \ldots, dq^{\rho^{\kappa^2} - \rho^{\kappa^1}}\rangle.
   \]
   Here generators are split to contain the maximal number of generators residing in \(\mathfrak{I}(\Foliation{Z}^{\kappa^1})\) and the remaining novel generators \(dq^i.\)
-  This is only possible due to~\ref{prop:reg-zero-dyn-fol:invariance} which implies that lie derivatives of forms in derived flag and in \(\mathfrak{I}(\Foliation{Z})\) remain in \(\mathfrak{I}(\Foliation{Z}).\)
+  This is only possible due to~\ref{prop:reg-zero-dyn-fol:invariance} (i.e.~\eqref{eqn:controlled-invariance}) which implies that repeated Lie derivatives of the exact generators \(dh^i\) found in the derived flag and \(\mathfrak{I}(\Foliation{Z}^{\kappa^1})\) remain in \(\mathfrak{I}(\Foliation{Z}^{\kappa^1})\) \(\subseteq\) \(\mathfrak{I}(\Foliation{Z}).\)
   The remaining generators \(dq^i\) integrate to form an output with uniform vector relative degree \(\kappa^2\) --- they do not reside in the more derived ideal --- and also form vector relative degree with the existing output components \(dh^i.\)
   Thus, we define the new regular zero dynamics foliation,
   \[

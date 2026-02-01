@@ -36,6 +36,7 @@ dfl-conf-paper.pdf: dfl-conf-paper.tex $(DFLCONFPAPERDEPENDS)
 	cd $(BUILDDIRECTORY)/$@/ && $(BIBTEX) dfl-conf-paper
 	cd $(BUILDDIRECTORY)/$@/ && $(TEXFOT) $(XELATEX) dfl-conf-paper.tex
 	cd $(BUILDDIRECTORY)/$@/ && $(TEXFOT) $(XELATEX) dfl-conf-paper.tex
+	cd $(BUILDDIRECTORY)/$@/ && $(TEXFOT) $(XELATEX) dfl-conf-paper.tex
 	cp $(BUILDDIRECTORY)/$@/$@ $@
 
 submission: submission-dfl-conf-paper.pdf.zip
