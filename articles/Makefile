@@ -9,47 +9,38 @@ BIBER          := biber
 FIGURESNAMES   := 
 PDFFIGURES     := $(addprefix figures/,$(addsuffix .pdf, $(FIGURESNAMES)))
 
-
 all: $(DOCUMENTS)
-
 
 clean:
 	rm -rf $(BUILDDIRECTORY) $(DOCUMENTS)
 
-
-# DFLPAPERDEPENDS := autart.cls notation.sty
-# dfl-paper.pdf: dfl-paper.tex $(DFLPAPERDEPENDS)
-# 	mkdir -p $(BUILDDIRECTORY)/$@/
-# 	cp $^ $(BUILDDIRECTORY)/$@/
-# 	cd $(BUILDDIRECTORY)/$@/ && $(TEXFOT) $(PDFLATEX) dfl-paper.tex
-# #	cd $(BUILDDIRECTORY)/$@/ && $(BIBER) confpaper
-# 	cd $(BUILDDIRECTORY)/$@/ && $(TEXFOT) $(PDFLATEX) dfl-paper.tex
-# 	cd $(BUILDDIRECTORY)/$@/ && $(TEXFOT) $(PDFLATEX) dfl-paper.tex
-# 	cp $(BUILDDIRECTORY)/$@/$@ $@
-
+DFLCONFPAPER 		:= dfl-conf-paper.pdf
+DFLCONFPAPERSOURCE  := dfl-conf-paper.tex
 DFLCONFPAPERDEPENDS := ifacconf.cls ifacconf.bst dflconfbib.bib figures.sty notation.sty
-dfl-conf-paper.pdf: dfl-conf-paper.tex $(DFLCONFPAPERDEPENDS)
+$(DFLCONFPAPER): $(DFLCONFPAPERSOURCE) $(DFLCONFPAPERDEPENDS)
 	mkdir -p $(BUILDDIRECTORY)/$@/
 	cp $^ $(BUILDDIRECTORY)/$@/
-	cp $(BUILDDIRECTORY)/$@/dfl-conf-paper.tex $(BUILDDIRECTORY)/$@/root.tex
-	cd $(BUILDDIRECTORY)/$@/ && $(TEXFOT) $(XELATEX) dfl-conf-paper.tex
-	cd $(BUILDDIRECTORY)/$@/ && $(BIBTEX) dfl-conf-paper
-	cd $(BUILDDIRECTORY)/$@/ && $(TEXFOT) $(XELATEX) dfl-conf-paper.tex
-	cd $(BUILDDIRECTORY)/$@/ && $(TEXFOT) $(XELATEX) dfl-conf-paper.tex
-	cd $(BUILDDIRECTORY)/$@/ && $(TEXFOT) $(XELATEX) dfl-conf-paper.tex
+	mv $(BUILDDIRECTORY)/$@/$(DFLCONFPAPERSOURCE) $(BUILDDIRECTORY)/$@/root.tex
+	cd $(BUILDDIRECTORY)/$@/ && $(TEXFOT) $(XELATEX) -jobname=$(basename $@) root.tex
+	cd $(BUILDDIRECTORY)/$@/ && $(BIBTEX) $(basename $@)
+	cd $(BUILDDIRECTORY)/$@/ && $(TEXFOT) $(XELATEX) -jobname=$(basename $@) root.tex
+	cd $(BUILDDIRECTORY)/$@/ && $(TEXFOT) $(XELATEX) -jobname=$(basename $@) root.tex
+	cd $(BUILDDIRECTORY)/$@/ && $(TEXFOT) $(XELATEX) -jobname=$(basename $@) root.tex
 	cp $(BUILDDIRECTORY)/$@/$@ $@
 
-submission: submission-dfl-conf-paper.pdf.zip
+submission-$(DFLCONFPAPER): $(BUILDDIRECTORY)/$(DFLCONFPAPER)/root.zip
 
-submission-dfl-conf-paper.pdf.zip: dfl-conf-paper.pdf
-	cd $(BUILDDIRECTORY)/dfl-conf-paper.pdf/ && zip $@ root.tex $(DFLCONFPAPERDEPENDS)
-	cp $(BUILDDIRECTORY)/dfl-conf-paper.pdf/$@ $@
+spellcheck-$(DFLCONFPAPER): $(BUILDDIRECTORY)/$(DFLCONFPAPER)/spellcheck.txt
 
-spellcheck: spellcheck-dfl-conf-paper
+$(BUILDDIRECTORY)/$(DFLCONFPAPER)/root.zip: $(DFLCONFPAPER)
+	cd $(BUILDDIRECTORY)/$(DFLCONFPAPER)/ && zip root.zip root.tex $(DFLCONFPAPERDEPENDS)
+
+$(BUILDDIRECTORY)/$(DFLCONFPAPER)/spellcheck.txt: $(DFLCONFPAPER)
+	cd $(BUILDDIRECTORY)/$(DFLCONFPAPER)/ && hunspell -l -t root.tex > spellcheck.txt
+
+submission: submission-$(DFLCONFPAPER)
+
+spellcheck: spellcheck-$(DFLCONFPAPER)
 
 
-spellcheck-%: %.tex
-	hunspell -l -t $*.tex > $@
-
-
-.PHONY: all clean package spellcheck submission
+.PHONY: all clean package spellcheck submission submission-$(DFLCONFPAPER)
