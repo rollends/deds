@@ -1,3 +1,4 @@
+\RequirePackage[hyphens]{url}
 \documentclass[a4paper]{ifacconf}
 \usepackage[T1]{fontenc}
 \usepackage{lmodern}
@@ -15,7 +16,7 @@
 \begin{frontmatter}
 
 \title{The Dynamic Search for the Minimal Dynamic Extension}
-\thanks[footnoteinfo]{This project was not funded or sponsored by any institution or grant.}
+\thanks[footnoteinfo]{This project was not funded or sponsored by any institution or grant. This work has been submitted to IFAC for possible publication.}
 \author[First]{Rollen S. D'Souza} 
 \address[First]{e-mail: research@rollends.ca.}
 
@@ -39,11 +40,11 @@
 \end{frontmatter}
 
 \section{Introduction}
-Identifying whether a nonlinear control system,
+Identifying whether a nonlinear control system,\hfill
 \[
   \dot{x} = f(x, u),
 \]
-can be transformed into a linear control system in Brunovsk\'y normal form,
+can be transformed into a linear control system in Brunovsk\'y normal form,\hfill
 \[
   \dot{\xi} = A\,\xi + B\,\nu,
 \]
@@ -996,7 +997,11 @@ Recall that the arrows of the category only need to be restricted to dynamic ext
 the restricted category includes extensions that neither improve nor degrade the defect although improvements are favoured by search algorithms.
 Let us turn to a few, simple examples to see the heuristic in action.
 
-\subsection{Example: A First-Order Dynamic Precompensator}
+\subsection{Examples}
+The examples below are supported by symbolic computation performed in \texttt{Maple}~\citep{maple_2025}.
+Worksheets are available publicly at~\citep{dsouza_deds_2026} alongside a custom \texttt{Maple} package that executes the dynamic search in the finite case.
+
+\subsubsection{A First-Order Dynamic Precompensator}
 Define the manifold \(\Manifold{M}\) \(=\) \(\Reals\) \(\times\) \(\Reals^4\) \(\times\) \(\Reals^6\) with input vector \(u \in \Reals^4\) and states \((x,y,\theta,z,w,\beta) \in \Reals^6.\)
 Set \(\alpha = \theta + \beta\) and \(\gamma = \alpha + z.\)
 Consider the nonlinear control system,
@@ -1056,7 +1061,7 @@ This defines a new manifold with additional coordinate \(q\) and the constraint~
 This extended system satisfies the feedback linearizability conditions~\eqref{eqn:involutivity} and~\eqref{eqn:controllability}.
 The dynamic programming algorithm terminates since any other extensions necessarily have a larger cost.
 
-\subsection{Example: A Second-Order Dynamic Precompensator}
+\subsubsection{A Second-Order Dynamic Precompensator}
 Consider a variation of the previous nonlinear control system,
 \[
   \scalebox{0.8}{\mbox{\ensuremath{\displaystyle%
