@@ -1,9 +1,7 @@
-\pdfobjcompresslevel=0
-\documentclass{ifacconf}
+\documentclass[a4paper]{ifacconf}
 \usepackage[T1]{fontenc}
 \usepackage{lmodern}
 
-\usepackage{caption}
 \usepackage{comment}
 \usepackage{enumitem}
 \usepackage{natbib}
@@ -24,10 +22,10 @@
 
 \begin{abstract}
   Identifying the dynamic precompensator that renders a nonlinear control system feedback linearizable is a challenging problem.
-  Researchers have explored the problem --- known as dynamic feedback linearizability --- over the last few decades producing existence conditions and constructive procedures for the dynamic precompensator.
+  Researchers have explored the problem --- dynamic feedback linearization --- and produced existence conditions and constructive procedures for the dynamic precompensator.
   These remain, in general, either computationally expensive or restrictive.
-  Treating the challenge as intrinsic, this article proposes viewing the problem as a search problem over a category.
-  Dynamic programming applies in this category and, upon restriction to a finite category, classic search algorithms find the minimal dynamic extension to feedback linearizability.
+  Treating the challenge as intrinsic, this article views the problem as a search problem over a category.
+  Dynamic programming applies and, upon restriction to a finite category, classic search algorithms find the minimal dynamic extension.
   Alternatively, a heuristic aiming towards feedback linearizable systems can be employed to select amongst the infinitely-many extensions.
   This framing provides a distinctive, birds-eye view of the search for the dynamic precompensator.
 \end{abstract}
