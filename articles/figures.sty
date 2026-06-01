@@ -3,7 +3,7 @@
 \RequirePackage[usenames, dvipsnames]{xcolor}
 \RequirePackage{tikz}
 
-\usetikzlibrary{arrows.meta, calc, cd, fit, positioning, decorations.pathreplacing}
+\usetikzlibrary{arrows.meta, bending, calc, cd, fit, patterns, positioning, decorations.pathreplacing}
 
 \tikzset{
   system path/.style={
@@ -19,6 +19,21 @@
     draw            = Black,
     rounded corners,
     align           = center
+  },
+  category object/.style={
+    circle,
+    fill            = Black,
+    inner sep       = 0,
+    outer sep       = 0,
+    anchor          = center,
+    minimum width   = 0.5em,
+    minimum height  = 0.5em
+  },
+  category arrow/.style={
+  },
+  category functor arrow/.style={
+    double equal sign distance,
+    -{Implies[]}
   },
   system block/.style = {
     rectangle,
@@ -45,7 +60,7 @@
     rounded corners
   },
   system area text/.style = {
-    text = Purple!50!Black,
+    text = Purple!25!Black,
   },
   system area red/.style = {
     rectangle,

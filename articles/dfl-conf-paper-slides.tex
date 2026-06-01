@@ -1,0 +1,876 @@
+\RequirePackage[hyphens]{url}
+\documentclass[a4paper]{beamer}
+\mode<presentation>
+\usetheme{Malmoe}
+
+\usepackage[T1]{fontenc}
+\usepackage{lmodern}
+
+\usepackage{comment}
+\usepackage{notation}
+
+\usepackage{figures}
+
+\title{The Dynamic Search for the Minimal Dynamic Extension}
+\author[D'Souza, R. S.]{Rollen S. D'Souza\\\texttt{research@rollends.ca}}
+\date[MTNS '26]{27th International Symposium on Mathematical Theory of Networks and Systems}
+
+\hypersetup{
+  pdfauthor={Rollen S. D'Souza},
+  pdftitle={The Dynamic Search for the Minimal Dynamic Extension}
+}
+
+\begin{document}
+
+\section{A Brief on Feedback Linearization}
+
+\begin{frame}
+  \frametitle{Static Feedback Linearization}
+  %
+  Find \(D\) and \(\phi\) so that...
+  \begin{center}
+    \begin{tikzpicture}[x = 1cm, y = 1cm]
+      \node[at = {(0, 0)}] (v) {};
+      \node[system block, right = 1 of v] (FLDecoupler) {%
+        \(%
+          u = D(x, v)
+        \)
+      };
+      \node[below = 0.5 of FLDecoupler.south] (P1) {};
+
+      \node[system block, right = 1 of FLDecoupler] (System) {%
+        \(\dot{x} = f(x, u)\)%
+      };
+
+      \node[system block, right = 1 of System] (FLOutput) {%
+        \(\phi(x)\)%
+      };
+      \node[right = 1 of FLOutput] (y) {};
+
+      \draw[system path, - Latex]
+        (v.base) node[above] {\(v\)} 
+          -- node[midway, coordinate] (midwayV) {}
+        (FLDecoupler.west);
+      \draw[system path, - Latex]
+        (FLDecoupler.east) -- node[above, midway] {\(u\)}(System.west);
+      \draw[system path, - Latex]
+        (System.east)
+          -- 
+        (FLOutput.west);
+      \draw[system path, - Latex]
+        (FLOutput.east)
+          -- node[midway, coordinate] (midwayY) {}
+          node[above] {\(y\)}
+        (y.base);
+
+      \draw[system path, - Latex]
+        (System.east) 
+          node[above right] {\(x\)}
+          -- 
+        +(0.5, 0)
+          |-
+        (P1.base)
+          --
+        (FLDecoupler.south);
+
+      \fill[system area, opacity=0.2]
+        ($(midwayV) + (0, 1)$) node[coordinate] (R1corner1) {}
+          rectangle node[coordinate] (R1) {}
+        ($(midwayY|-P1)+(0,-1)$) node[coordinate] (R1corner2) {};
+
+      \draw[]
+        (R1|-R1corner2)
+        node[system area text, anchor=north]
+          {\(\dot{y} = A\,y+B\,v\)\quad i.e. \quad \(Y^j(s) = \frac{1}{s^{\kappa^j}}\,V^j(s)\)};
+    \end{tikzpicture}
+  \end{center}
+  is in Brunovsk\'y normal form.
+  %
+\end{frame}
+
+\begin{frame}
+  \frametitle{Dynamic Feedback Linearization}
+  Many systems are not feedback linearizable.
+  Find a precompensator,
+  %
+  \begin{center}
+    \begin{tikzpicture}[x = 0.95cm, y = 0.95cm, node font={\tiny}]
+      \node[at = {(0, 0)}] (v) {};
+      \node[system block, right = 1 of v] (FLDecoupler) {%
+        \(%
+          \nu = D(x, z, v)
+        \)
+      };
+
+      \node[below = 0.75 of FLDecoupler.south] (P1) {};
+
+      \node[system block, right = 1 of FLDecoupler] (Precompensator) {%
+        \(%
+          \begin{aligned}
+            \dot{z} &= a(x, \nu, z)\\
+            u &= b(x, \nu, z)
+          \end{aligned}%
+        \)
+      };
+      \node[below = 0.25 of Precompensator.south] (P2) {};
+
+      \node[system block, right = 1 of Precompensator] (System) {%
+        \(\dot{x} = f(x, u)\)%
+      };
+
+      \node[system block, right = 1 of System] (FLOutput) {%
+        \(\phi(x, z)\)%
+      };
+      \node[right = 1 of FLOutput] (y) {};
+
+      \draw[system path, - Latex]
+        (v.base) node[above] {\(v\)} 
+          -- node[midway, coordinate] (midwayV) {}
+        (FLDecoupler.west);
+      \draw[system path, - Latex]
+        (FLDecoupler.east) -- node[above, midway] {\(\nu\)}(Precompensator.west);
+
+      \draw[system path, - Latex]
+        (Precompensator.east) -- node[above, midway] {\(u\)}(System.west);
+      \draw[system path]
+        (Precompensator.north)
+          --
+        +(0, 0.25)
+          -|
+        ($(System.east) + (0.25, 0)$)
+          --
+        +(0.2, 0);
+      \draw[system path, - Latex]
+        (System.east) 
+          -- 
+        +(0.5, 0)
+          |-
+        (P2.base)
+          --
+        (Precompensator.south);
+      
+      \draw[system path, - Latex]
+        (System.east)
+          -- 
+        (FLOutput.west);
+      \draw[system path, - Latex]
+        (FLOutput.east)
+          -- node[midway, coordinate] (midwayY) {}
+          node[above] {\(y\)}
+        (y.base);
+
+      \draw[system path, - Latex]
+        (System.east) 
+          -- 
+        +(0.5, 0)
+          |-
+          node[below right] {\((x, z)\)}
+        (P1.base)
+          --
+        (FLDecoupler.south);
+
+      \fill[system area, blend mode=multiply, opacity=0.2]
+        ($(midwayV) + (0, 1)$) node[coordinate] (R1corner1) {}
+          rectangle node[coordinate] (R1) {}
+        ($(midwayY|-P1)+(0,-1)$) node[coordinate] (R1corner2) {};
+
+      \draw[]
+        (R1|-R1corner2)
+        node[system area text, anchor=north]
+          {\(\dot{y} = A\,y+B\,v\)\quad i.e. \quad \(Y^j(s) = \frac{1}{s^{\kappa^j}}\,V^j(s)\)};
+
+    \end{tikzpicture}
+  \end{center}
+  %
+  so that a \(D\) and \(\phi\) exists to feedback linearize the closed-loop.
+  \pause
+  In practice, very hard.
+  Common to incrementally construct it through ``dynamic extension''.
+\end{frame}
+
+\begin{frame}
+  \frametitle{Dynamic Extension}
+  New controller states are just derivatives of functions of the input \(u\) and/or state \(x.\)
+  %
+  \begin{center}
+    \begin{tikzpicture}[x = 1cm, y = 1cm]
+      
+    \end{tikzpicture}
+  \end{center}
+  %
+\end{frame}
+
+\section{The Optimality Principle}
+
+\begin{frame}
+  \begin{quote}
+    An optimal policy has the property that, whatever the initial state and initial decisions are, the remaining decisions must constitute an optimal policy with regard to the state resulting from the first decisions.
+    --- Bellman, 1954
+  \end{quote}
+\end{frame}
+
+\begin{frame}
+  \frametitle{Objects and Arrows}
+  A \defining{category} is a collection of objects and arrows between objects that satisfy composition axioms.
+  %
+  \begin{center}
+    \begin{tikzpicture}[x = 1cm, y = 1cm]
+      \node[category object] (A) {};
+      \node[category object, right = 2 of A.center] (B) {};
+      \node[category object, right = 2 of B.center] (C) {};
+
+      \draw[category arrow, - Latex]
+        (A.north west)
+          node [below = 0.25] {\(a\)}
+          .. controls ($(A) + (-0.75, 0.5)$) and ($(A) + (-0.75, -0.5)$) ..
+          node [left, midway] {\(\Identity_a\)}
+        (A.south west);
+      \draw[category arrow, - Latex]
+        (B.north east) 
+          node [below = 0.25] {\(b\)}
+          .. controls ($(B) + (0.75, 0.5)$) and ($(B) + (0.75, -0.5)$) ..
+          node [right, midway] {\(\Identity_b\)}
+        (B.south east);
+      \draw[category arrow, - Latex]
+        (C.north east) 
+          node [below = 0.25] {\(c\)}
+          .. controls ($(C) + (0.75, 0.5)$) and ($(C) + (0.75, -0.5)$) ..
+          node [right, midway] {\(\Identity_c\)}
+        (C.south east);
+
+      \draw[category arrow, - Latex]
+        (A) 
+          -- 
+          node [above, midway] {\(g\)}  
+        (B);
+      \draw[category arrow, - Latex]
+        (B)
+          .. controls ($(B) + (0.5, 1)$) and ($(C)+(-0.5, 1)$) ..
+          node [above, midway] {\(h_*\)}
+        (C);
+      \draw[category arrow, - Latex]
+        (B)
+          .. controls ($(B) + (0.5, -1)$) and ($(C)+(-0.5, -1)$) ..
+          node [below, midway] {\(h\)}
+        (C);
+
+      \only<2->{
+        \draw[category arrow, - Latex]
+          (A)
+            .. controls ($(A) + (1, 2)$) and ($(C)+(-1, 2)$) ..
+            node [above, midway] {\(h_* \circ g\)}
+          (C);
+        \draw[category arrow, - Latex]
+          (A)
+            .. controls ($(A) + (1, -2)$) and ($(C)+(-1, -2)$) ..
+            node [below, midway] {\(h \circ g\)}
+          (C);
+      }
+    \end{tikzpicture}
+  \end{center}
+\end{frame}
+
+\begin{frame}
+  \frametitle{The Optimal Arrow}
+  Define a loss \(L: \Category{X} \to \Reals\) that assigns a real number to each arrow.
+  %
+  \begin{center}
+    \begin{tikzpicture}[x = 1cm, y = 1cm, node font={\tiny}]
+      \node[category object] (A) {};
+      \node[category object, right = 2 of A.center] (B) {};
+      \node[category object, right = 2 of B.center] (C) {};
+
+      \draw[category arrow, - Latex]
+        (A.north west)
+          node [below = 0.25] {\(a\)}
+          .. controls ($(A) + (-0.75, 0.5)$) and ($(A) + (-0.75, -0.5)$) ..
+          node [left, midway] {\(\Identity_a\)}
+        (A.south west);
+      \draw[category arrow, - Latex]
+        (B.north east) 
+          node [below = 0.25] {\(b\)}
+          .. controls ($(B) + (0.75, 0.5)$) and ($(B) + (0.75, -0.5)$) ..
+          node [right, midway] {\(\Identity_b\)}
+        (B.south east);
+      \draw[category arrow, - Latex]
+        (C.north east) 
+          node [below = 0.25] {\(c\)}
+          .. controls ($(C) + (0.75, 0.5)$) and ($(C) + (0.75, -0.5)$) ..
+          node [right, midway] (IdC) {\(\Identity_c\)}
+        (C.south east);
+
+      \draw[category arrow, - Latex]
+        (A) 
+          -- 
+          node [above, midway] {\(g\)}  
+        (B);
+      \draw[category arrow, - Latex]
+        (B)
+          .. controls ($(B) + (0.5, 1)$) and ($(C)+(-0.5, 1)$) ..
+          node [above, midway] {\(h_*\)}
+        (C);
+      \draw[category arrow, - Latex]
+        (B)
+          .. controls ($(B) + (0.5, -1)$) and ($(C)+(-0.5, -1)$) ..
+          node [below, midway] {\(h\)}
+        (C);
+
+      \draw[category arrow, - Latex]
+        (A)
+          .. controls ($(A) + (1, 2)$) and ($(C)+(-1, 2)$) ..
+          node [above, midway] {\(h_* \circ g\)}
+        (C);
+      \draw[category arrow, - Latex]
+        (A)
+          .. controls ($(A) + (1, -2)$) and ($(C)+(-1, -2)$) ..
+          node [below, midway] {\(h \circ g\)}
+        (C);
+      
+      \node[coordinate, right = 3 of C] (RealsBase) {};
+      \node[category object, below = 2 of RealsBase] (RealsZero) {};
+      \node[coordinate, above = 0.5 of RealsZero] (Reals1) {};
+      \node[coordinate, above = 1 of RealsZero] (Reals2) {};
+      \node[coordinate, above = 1.5 of RealsZero] (Reals3) {};
+      \node[coordinate, above = 2 of RealsZero] (Reals4) {};
+      \node[coordinate, above = 2.5 of RealsZero] (Reals5) {};
+      \node[coordinate, above = 3 of RealsZero] (Reals6) {};
+      \node[coordinate, above = 3.5 of RealsZero] (Reals7) {};
+      \node[coordinate, above = 2 of RealsBase] (RealsInfty) {};
+
+      \draw[thick, -{Latex[open]}]
+        (RealsBase)
+          node[right] {\(\Reals\)}
+          --
+        (RealsInfty);
+      \draw[thick]
+        (RealsBase)
+          --
+        (RealsZero);
+            
+      \draw[category functor arrow]
+        ($(IdC)+(0.5, 0)$) 
+          -- 
+          node[above, midway] {\(L\)}
+        ($(RealsBase)+(-0.5, 0)$);
+      
+      \draw[category arrow, - Latex]
+        (RealsZero.south west)
+          ..
+          controls ($(RealsZero) + (-0.5, -0.5)$) and ($(RealsZero) + (0.5, -0.5)$) 
+          ..
+          node [below, midway] {\(L(\Identity_\Box)\)}
+        (RealsZero.south east);
+      
+      \draw[category arrow, - Latex]
+        (RealsZero)
+          .. 
+          controls ($(RealsZero) + (-0.5, 0)$) and ($(Reals1) + (-0.5, 0)$) 
+          ..
+          node [left, midway] {\(L(h_*)\)}
+        (Reals1);
+
+      \draw[category arrow, - Latex]
+        (RealsZero)
+          .. 
+          controls ($(RealsZero) + (0.5, 0)$) and ($(Reals2) + (0.5, 0)$) 
+          ..
+        (Reals2)
+          node [left] {\(L(h)\)};
+      \draw[category arrow, - Latex]
+        (RealsZero)
+          .. 
+          controls ($(RealsZero) + (1, 0)$) and ($(Reals5) + (1, 0)$) 
+          ..
+        (Reals5)
+          node [left] {\(L(g)\)};
+      \draw[category arrow, - Latex]
+        (RealsZero)
+          .. 
+          controls ($(RealsZero) + (1.5, 0)$) and ($(Reals6) + (1.5, 0)$) 
+          ..
+        (Reals6)
+          node [left] {\(L(h_* \circ g)\)};
+      \draw[category arrow, - Latex]
+        (RealsZero)
+          .. 
+          controls ($(RealsZero) + (1.5, 0)$) and ($(Reals7) + (1.5, 0)$) 
+          ..
+        (Reals7)
+          node [left] {\(L(h \circ g)\)};
+    \end{tikzpicture}
+  \end{center}
+  %
+  \pause
+  %
+  An \emph{optimal arrow} between two objects \(a,\) \(c \in \Category{X}\) solves,
+  \[
+    \min_{f \in \HomSet(a, c)} L(f).
+  \]
+\end{frame}
+
+\begin{frame}
+  \frametitle{The Optimality Principle Revisited}
+  \only<1>{
+    \begin{quote}
+      An optimal policy has the property that, whatever the initial state and initial decisions are, the remaining decisions must constitute an optimal policy with regard to the state resulting from the first decisions.
+      --- Bellman, 1954
+    \end{quote}
+  }
+  \only<2->{
+    \begin{theorem}[Optimality Principle]
+      If \(f\) \(\in\) \(\OptSet(a, c)\) is a \emph{composite} optimal arrow that decomposes into \(f\) \(=\) \only<2>{\(h\)}\only<3->{{\color{red}\(h_*\)}} \(\circ\) \(g\) for some \(g\) \(\in\) \(\HomSet(a, b),\) \only<2>{\(h\)}\only<3->{{\color{red}\(h_*\)}} \(\in\) \(\HomSet(b, c)\) and \(b\) \(\in\) \(\Category{X},\)
+      then \only<2>{\(h\)}\only<3->{{\color{red}\(h_*\)}} \(\in\) \(\OptSet(b, c)\) is an optimal arrow.
+    \end{theorem}
+  }
+  \begin{center}
+    \begin{tikzpicture}[x = 1cm, y = 1cm, node font={\tiny}]
+      \only<1>{
+        \tikzset{%
+          g/.style={},
+          hstar/.style={},
+          h/.style={},
+          h_circ_g/.style={},
+          hstar_circ_g/.style={}}
+      }
+      \only<2>{
+        \tikzset{%
+          g/.style={opacity=0.2},
+          hstar/.style={opacity=0.2},
+          h/.style={opacity=0.2},
+          h_circ_g/.style={},
+          hstar_circ_g/.style={color=red}}
+      }
+      \only<3>{
+        \tikzset{%
+          g/.style={opacity=0.2},
+          hstar/.style={color=red},
+          h/.style={},
+          h_circ_g/.style={opacity=0.2},
+          hstar_circ_g/.style={color=red,opacity=0.2}}
+      }
+      \node[category object] (A) {};
+      \node[category object, right = 2 of A.center] (B) {};
+      \node[category object, right = 2 of B.center] (C) {};
+
+      \draw[]
+        (A) node[below left] {\(a\)}
+        (B) node[below left] {\(b\)}
+        (C) node[below right] {\(c\)};
+
+      \draw[category arrow, - Latex, g]
+        (A) 
+          -- 
+          node [above, midway] {\(g\)}  
+        (B);
+      \draw[category arrow, - Latex, hstar]
+        (B)
+          .. controls ($(B) + (0.5, 1)$) and ($(C)+(-0.5, 1)$) ..
+          node [above, midway] {\(h_*\)}
+        (C);
+      \draw[category arrow, - Latex, h]
+        (B)
+          .. controls ($(B) + (0.5, -1)$) and ($(C)+(-0.5, -1)$) ..
+          node [below, midway] {\(h\)}
+        (C);
+
+      \draw[category arrow, - Latex, hstar_circ_g]
+        (A)
+          .. controls ($(A) + (1, 2)$) and ($(C)+(-1, 2)$) ..
+          node [above, midway] {\(h_* \circ g\)}
+        (C);
+      \draw[category arrow, - Latex, h_circ_g]
+        (A)
+          .. controls ($(A) + (1, -2)$) and ($(C)+(-1, -2)$) ..
+          node [below, midway] {\(h \circ g\)}
+        (C);
+      
+      \node[coordinate, right = 3 of C] (RealsBase) {};
+      \node[category object, below = 2 of RealsBase] (RealsZero) {};
+      \node[coordinate, above = 0.5 of RealsZero] (Reals1) {};
+      \node[coordinate, above = 1 of RealsZero] (Reals2) {};
+      \node[coordinate, above = 1.5 of RealsZero] (Reals3) {};
+      \node[coordinate, above = 2 of RealsZero] (Reals4) {};
+      \node[coordinate, above = 2.5 of RealsZero] (Reals5) {};
+      \node[coordinate, above = 3 of RealsZero] (Reals6) {};
+      \node[coordinate, above = 3.5 of RealsZero] (Reals7) {};
+      \node[coordinate, above = 2 of RealsBase] (RealsInfty) {};
+
+      \draw[thick, -{Latex[open]}]
+        (RealsBase)
+          node[right] {\(\Reals\)}
+          --
+        (RealsInfty);
+      \draw[thick]
+        (RealsBase)
+          --
+        (RealsZero);
+            
+      \draw[category functor arrow]
+        ($(IdC)+(0.5, 0)$) 
+          -- 
+          node[above, midway] {\(L\)}
+        ($(RealsBase)+(-0.5, 0)$);
+
+      \draw[category arrow, - Latex, hstar]
+        (RealsZero)
+          .. 
+          controls ($(RealsZero) + (-0.5, 0)$) and ($(Reals1) + (-0.5, 0)$) 
+          ..
+          node [left, midway] {\(L(h_*)\)}
+        (Reals1);
+
+      \draw[category arrow, - Latex, h]
+        (RealsZero)
+          .. 
+          controls ($(RealsZero) + (0.5, 0)$) and ($(Reals2) + (0.5, 0)$) 
+          ..
+        (Reals2)
+          node [left] {\(L(h)\)};
+      \draw[category arrow, - Latex, g]
+        (RealsZero)
+          .. 
+          controls ($(RealsZero) + (1, 0)$) and ($(Reals5) + (1, 0)$) 
+          ..
+        (Reals5)
+          node [left] {\(L(g)\)};
+      \draw[category arrow, - Latex, hstar_circ_g]
+        (RealsZero)
+          .. 
+          controls ($(RealsZero) + (1.5, 0)$) and ($(Reals6) + (1.5, 0)$) 
+          ..
+        (Reals6)
+          node [left] {\(L(h_* \circ g)\)};
+      \draw[category arrow, - Latex, h_circ_g]
+        (RealsZero)
+          .. 
+          controls ($(RealsZero) + (1.5, 0)$) and ($(Reals7) + (1.5, 0)$) 
+          ..
+        (Reals7)
+          node [left] {\(L(h \circ g)\)};
+    \end{tikzpicture}
+  \end{center}
+\end{frame}
+
+\begin{frame}
+  \frametitle{A Sufficient Condition for the Principle}
+  %
+  \only<1>{
+    \begin{theorem}
+      If the loss \(L: \Category{X} \to \Reals\) is a functor, then the Optimality Principle holds.
+    \end{theorem}
+  }
+  \only<2->{
+  \begin{center}
+    the loss of a composition is a composition of the losses\\
+    \(\implies\)\\
+    Optimality Principle
+  \end{center}
+  }
+  %
+  \begin{center}
+    \begin{tikzpicture}[x = 1cm, y = 1cm, node font={\tiny}]
+      \only<1>{
+        \tikzset{%
+          g/.style={},
+          hstar/.style={},
+          h/.style={},
+          h_circ_g/.style={},
+          hstar_circ_g/.style={},
+          twohide/.style={}}
+      }
+      \only<2->{
+        \tikzset{%
+          g/.style={},
+          hstar/.style={dashed, red},
+          h/.style={dashed, red},
+          h_circ_g/.style={},
+          hstar_circ_g/.style={},
+          twohide/.style={}}
+      }
+      \node[category object] (A) {};
+      \node[category object, right = 2 of A.center] (B) {};
+      \node[category object, right = 2 of B.center] (C) {};
+
+      \draw[]
+        (A) node[below left] {\(a\)}
+        (B) node[below left] {\(b\)}
+        (C) node[below right] {\(c\)};
+
+      \draw[category arrow, - Latex, g]
+        (A) 
+          -- 
+          node [above, midway] {\(g\)}  
+        (B);
+      \draw[category arrow, - Latex, hstar]
+        (B)
+          .. controls ($(B) + (0.5, 1)$) and ($(C)+(-0.5, 1)$) ..
+          node [above, midway] {\(h_*\)}
+        (C);
+      \draw[category arrow, - Latex, h]
+        (B)
+          .. controls ($(B) + (0.5, -1)$) and ($(C)+(-0.5, -1)$) ..
+          node [below, midway] {\(h\)}
+        (C);
+
+      \draw[category arrow, - Latex, hstar_circ_g]
+        (A)
+          .. controls ($(A) + (1, 2)$) and ($(C)+(-1, 2)$) ..
+          node [above, midway] {\(h_* \circ g\)}
+        (C);
+      \draw[category arrow, - Latex, h_circ_g]
+        (A)
+          .. controls ($(A) + (1, -2)$) and ($(C)+(-1, -2)$) ..
+          node [below, midway] {\(h \circ g\)}
+        (C);
+      
+      \node[coordinate, right = 3 of C] (RealsBase) {};
+      \node[category object, below = 2 of RealsBase] (RealsZero) {};
+      \node[coordinate, above = 0.5 of RealsZero] (Reals1) {};
+      \node[coordinate, above = 1 of RealsZero] (Reals2) {};
+      \node[coordinate, above = 1.5 of RealsZero] (Reals3) {};
+      \node[coordinate, above = 2 of RealsZero] (Reals4) {};
+      \node[coordinate, above = 2.5 of RealsZero] (Reals5) {};
+      \node[coordinate, above = 3 of RealsZero] (Reals6) {};
+      \node[coordinate, above = 3.5 of RealsZero] (Reals7) {};
+      \node[coordinate, above = 2 of RealsBase] (RealsInfty) {};
+
+      \draw[thick, -{Latex[open]}]
+        (RealsBase)
+          node[right] {\(\Reals\)}
+          --
+        (RealsInfty);
+      \draw[thick]
+        (RealsBase)
+          --
+        (RealsZero);
+            
+      \draw[category functor arrow]
+        ($(IdC)+(0.5, 0)$) 
+          -- 
+          node[above, midway] {\(L\)}
+        ($(RealsBase)+(-0.5, 0)$);
+
+      \draw[category arrow, - Latex]
+        (RealsZero)
+          .. 
+          controls ($(RealsZero) + (-0.5, 0)$) and ($(Reals1) + (-0.5, 0)$) 
+          ..
+          node [left, midway] {\(L(h_*)\)}
+        (Reals1);
+      \draw[category arrow, - Latex]
+        (RealsZero)
+          .. 
+          controls ($(RealsZero) + (0.5, 0)$) and ($(Reals2) + (0.5, 0)$) 
+          ..
+        (Reals2)
+          node [left] {\(L(h)\)};
+          
+      \draw<2->[category arrow, - Latex, hstar, thick]
+        (Reals5)
+          .. 
+          controls ($(Reals5) + (-0.5, 0)$) and ($(Reals6) + (-0.5, 0)$) 
+          ..
+        (Reals6);
+      \draw<2->[category arrow, - Latex, h, thick]
+        (Reals5)
+          .. 
+          controls ($(Reals5) + (0.5, 0)$) and ($(Reals7) + (0.5, 0)$) 
+          ..
+        (Reals7);
+
+      \draw[category arrow, - Latex, g]
+        (RealsZero)
+          .. 
+          controls ($(RealsZero) + (1, 0)$) and ($(Reals5) + (1, 0)$) 
+          ..
+        (Reals5)
+          node [left, twohide] {\(L(g)\)};
+      \draw[category arrow, - Latex, hstar_circ_g]
+        (RealsZero)
+          .. 
+          controls ($(RealsZero) + (1.5, 0)$) and ($(Reals6) + (1.5, 0)$) 
+          ..
+        (Reals6)
+          node [left, twohide] {\only<2->{{\color{red}\(L(h_*)\circ L(g)\) \(=\)} }\(L(h_* \circ g)\)};
+      \draw[category arrow, - Latex, h_circ_g]
+        (RealsZero)
+          .. 
+          controls ($(RealsZero) + (1.5, 0)$) and ($(Reals7) + (1.5, 0)$) 
+          ..
+        (Reals7)
+          node [left, twohide] {\only<2->{{\color{red}\(L(h)\circ L(g)\) \(=\)} }\(L(h \circ g)\)};
+    \end{tikzpicture}
+  \end{center}
+\end{frame}
+
+\begin{frame}
+  \frametitle{The Dynamic Programming Equation}
+  Optimality Principle (\& Functoriality) implies...
+  \[
+    J^*_L(a, c)
+      =
+          \min_{
+            \begin{subarray}{c}
+              b  \in \mathcal{X} \setminus \{a, c\}\\
+              g   \in \PrimSet(a, c)
+            \end{subarray}
+          }{
+            \Loss(g) + J^*_L(b, c)
+          }.
+  \]
+  \begin{center}
+    \begin{tikzpicture}[x = 0.7cm, y = 0.7cm]
+      \node[category object] (A) {};
+      \node[category object, above right = 2 of A.center] (C1) {};
+      \node[category object, below right = 2 of A.center] (C2) {};
+      \node[category object, right = 4 of A.center] (B) {};
+
+      \draw[category arrow, - Latex]
+        (A)
+          ..
+          controls ($0.5*(A) + 0.5*(C1)+(-0.25,-0.5)$) and ($0.5*(A) + 0.5*(C1)+(0,-0.5)$)
+          ..
+        ($0.5*(A) + 0.5*(C1)$)
+          ..
+          controls ($0.5*(A) + 0.5*(C1)+(0,0.5)$) and ($(C1)+(-0.75, -0.25)$)
+          ..
+        (C1);
+
+      \draw[category arrow, - Latex]
+        (A)
+          ..
+          controls ($(A)+(-0.15,-0.65)$) and ($0.5*(A) + 0.5*(C2)+(-0.5,0)$)
+          ..
+        ($0.5*(A) + 0.5*(C2)$)
+          ..
+          controls ($0.5*(A) + 0.5*(C2)+(0.5,0)$) and ($(C2)+(-0.25, 0)$)
+          ..
+        (C2);
+
+      \fill[color=Black!15!White, blend mode=multiply, pattern=dots]
+        (C1.center)
+          ..
+          controls ($(C1) + (0.15, 1.2)$) and ($0.5*(C1) + 0.5*(B) + (-1, 1.5)$)
+          ..
+        ($0.5*(C1) + 0.5*(B) + (0, 1)$)
+          ..
+          controls ($0.5*(C1) + 0.5*(B) + (1, 0.5)$) and ($(B) + (-0.15, 1)$)
+          ..
+        (B.center)
+          ..
+          controls ($(B) + (-0.65, -0.15)$) and ($0.5*(C1) + 0.5*(B) + (-0.25, -0.5) + (-0.5, -1)$)
+          ..
+        ($0.5*(C1) + 0.5*(B) + (-0.25, -0.5)$)
+          ..
+          controls ($0.5*(C1) + 0.5*(B) + (-0.25, -0.5) + (0.5, 1)$) and ($(C1) + (1, -1)$)
+          ..
+        (C1.center);
+      \fill[color=Black!8!White, blend mode=multiply]
+        (C1.center)
+          ..
+          controls ($(C1) + (0.15, 1.2)$) and ($0.5*(C1) + 0.5*(B) + (-1, 1.5)$)
+          ..
+        ($0.5*(C1) + 0.5*(B) + (0, 1)$)
+          ..
+          controls ($0.5*(C1) + 0.5*(B) + (1, 0.5)$) and ($(B) + (-0.15, 1)$)
+          ..
+        (B.center)
+          ..
+          controls ($(B) + (-0.65, -0.15)$) and ($0.5*(C1) + 0.5*(B) + (-0.25, -0.5) + (-0.5, -1)$)
+          ..
+        ($0.5*(C1) + 0.5*(B) + (-0.25, -0.5)$)
+          ..
+          controls ($0.5*(C1) + 0.5*(B) + (-0.25, -0.5) + (0.5, 1)$) and ($(C1) + (1, -1)$)
+          ..
+        (C1.center);
+
+      \draw[category arrow, - Latex, color=red]
+        (C1)
+          ..
+          controls ($(C1) + (0.45, 0.8)$) and ($0.5*(C1) + 0.5*(B) + (0.25, 0) + (0.5, 0.35)$)
+          ..
+        ($0.5*(C1) + 0.5*(B) + (0.25, 0)$)
+          ..
+          controls ($0.5*(C1) + 0.5*(B) + (0.25, 0) + (-0.5, -0.35)$) and ($(B) + (-0.4, 0)$)
+          ..
+        (B);
+
+      \fill[color=Black!15!White, blend mode=multiply, pattern=dots]
+        (C2.center)
+          ..
+          controls ($(C2) + (0.8, 0.2)$) and ($0.5*(C2) + 0.5*(B) + (0, 1) + (-0.5, 0)$)
+          ..
+        ($0.5*(C2) + 0.5*(B) + (0, 1)$)
+          ..
+          controls ($0.5*(C2) + 0.5*(B) + (0, 1) + (0.5, 0)$) and ($(B) + (-0.15, 0.3)$)
+          ..
+        (B.center)
+          ..
+          controls ($(B) + (-0.15, -0.65)$) and ($0.5*(C2) + 0.5*(B) + (0, -1) + (0.5, 0.5)$)
+          ..
+        ($0.5*(C2) + 0.5*(B) + (0, -1)$)
+          ..
+          controls ($0.5*(C2) + 0.5*(B) + (0, -1) + (-0.5, -0.5)$) and ($(C2) + (0.8, -0.3)$)
+          ..
+        (C2.center);
+      \fill[color=Black!8!White, blend mode=multiply]
+        (C2.center)
+          ..
+          controls ($(C2) + (0.8, 0.2)$) and ($0.5*(C2) + 0.5*(B) + (0, 1) + (-0.5, 0)$)
+          ..
+        ($0.5*(C2) + 0.5*(B) + (0, 1)$)
+          ..
+          controls ($0.5*(C2) + 0.5*(B) + (0, 1) + (0.5, 0)$) and ($(B) + (-0.15, 0.3)$)
+          ..
+        (B.center)
+          ..
+          controls ($(B) + (-0.15, -0.65)$) and ($0.5*(C2) + 0.5*(B) + (0, -1) + (0.5, 0.5)$)
+          ..
+        ($0.5*(C2) + 0.5*(B) + (0, -1)$)
+          ..
+          controls ($0.5*(C2) + 0.5*(B) + (0, -1) + (-0.5, -0.5)$) and ($(C2) + (0.8, -0.3)$)
+          ..
+        (C2.center);
+
+      \draw[category arrow, - Latex, color=red]
+        (C2)
+          ..
+          controls ($(C2) + (0.5, 0)$) and ($0.5*(C2) + 0.5*(B) + (-0.2, 0) + (-0.1, -0.4)$)
+          ..
+        ($0.5*(C2) + 0.5*(B) + (-0.2, 0)$)
+          ..
+          controls ($0.5*(C2) + 0.5*(B) + (-0.2, 0) + (0.1, 0.4)$) and ($(B) + (-0.5, 0.1)$)
+          ..
+        (B);
+
+    \end{tikzpicture}
+  \end{center}
+  \pause
+  ...but what if you don't know what \(a\) is or how to get there?
+\end{frame}
+
+\begin{frame}
+  \frametitle{Heuristic Searches}
+  Define a \defining{cost-to-come} heuristic \(H: \ObjectClass_\Category{X} \to \Reals\) that is a lower-bound estimator for the required loss to get to the goal (i.e. best-case cost).
+
+
+  Then we can define the heuristic-adjusted loss,
+  \[
+    L_H(a, b) \defineas L(a,b) - H(a) + H(b)
+  \]
+  that remains functorial if \(L\) is!
+
+  Dynamic Programming still applies.
+\end{frame}
+
+\section{The Dynamic Search for the Minimal Dynamic Extension}
+
+\begin{frame}
+  \frametitle{A New Perspective}  
+\end{frame}
+
+\begin{frame}
+  \titlepage
+\end{frame}
+
+\end{document}
