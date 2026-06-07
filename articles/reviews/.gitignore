@@ -1,0 +1,7 @@
+# We can not make reviews public. But i should still track them for
+# my future use. This gitignore just ensures i don't accidentally 
+# commit the (unencrypted) reviews.
+*.*
+!*.asc
+!*.pgp
+!*.gpg

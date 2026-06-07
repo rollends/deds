@@ -31,7 +31,7 @@
 
 \begin{keyword}
   dynamic feedback linearization; dynamic extension; differential flatness; dynamic programming.\\
-  
+  \vfill
 
   \emph{2020 Mathematics Subject Classification}: 93C10, 93B27, 93C35
 \end{keyword}
@@ -151,7 +151,7 @@ The Lie derivative of \(\omega\) along \(f \in \TangentSections{\Manifold{M}}\) 
 \label{section:geoemetry}
 A formal definition of dynamic extension is required to characterize the class of systems to search.
 The nonlinear control system is viewed as an exterior differential system~\citep{guay_condition_1997, dsouza_algorithm_2023}.
-Dynamic extension is then the addition of constraints arising through Lie derivatives.
+Dynamic extension is then the addition of differential constraints arising through Lie derivatives.
 
 \subsection{Feedback Linearization Theory}
 Let \(x \in \Manifold{X}\) \(=\) \(\Reals^n\) be the vector of \(n\) states and \(u \in \Manifold{U}\) \(=\) \(\Reals^m\) be the vector of \(m\) inputs.
@@ -1009,7 +1009,7 @@ and we can identify generators
 Necessarily \(d\omega^i \wedge \sigma \neq 0.\)
 Find the smallest set \(V = \{dv^1, \ldots, dv^\ell\}\) that solves,
 \[
-  \tiny
+  \scalebox{0.8}{\mbox{\ensuremath{\displaystyle%
   \begin{array}{cc}
     \min_{%
         V \subseteq \langle \Ideal{I}^{\smash{\scriptscriptstyle(k^\star - 1)}}, dt\rangle        
@@ -1026,6 +1026,7 @@ Find the smallest set \(V = \{dv^1, \ldots, dv^\ell\}\) that solves,
       % \;&
       % d\omega^r \wedge \sigma \wedge dv^{1} \wedge \cdots \wedge dv^{\ell} = 0
   \end{array}
+  }}}
 \]
 The set \(V\) contains the smallest number of exact forms in the preceding ideal (integrable by~\eqref{eqn:involutivity}) that, if prolonged into the defective ideal, renders the \(\omega^i\) differentially closed.
 The problem bears resemblance to the hitting set problem.
@@ -1125,7 +1126,7 @@ The obstruction to integrability are the forms, \(dx\) \(-\) \(\cot(\theta + z) 
 These look similar to the previous example, but, for these forms, one must pick an exact differential from each of the ideals, \(\langle dx, dy, d\theta + dz \rangle,\) and \(\langle d\beta, dz, dw\rangle\) respectively.
 These ideals have no single, common exact one-form.
 Any dynamic extension that brings this ideal into involution must involve a two-step extension.
-We can begin with an extension of along \(z\) and then subsequently add an extension of \(\theta\) to form an extension along the regular zero dynamics foliation induced by output \((\theta + z, z).\)
+We can begin with an extension of \(z\) and then subsequently add an extension of \(\theta\) to form an extension along the regular zero dynamics foliation induced by output \((\theta + z, z).\)
 The extensions result in a feedback linearizable system.
 The search terminates here.
 
