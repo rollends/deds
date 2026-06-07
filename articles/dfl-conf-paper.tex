@@ -137,7 +137,7 @@ Let \(p\) \(\in\) \(\OpenSet{U}.\)
 % It can be bundled over \(\Manifold{M}\) to form the tangent bundle \(\TangentBundle{\Manifold{M}}.\)
 The cotangent space \(\CotangentSpace{\Manifold{M}}{p}\) at \(p\) is spanned by one-forms \(dx^1_p,\) \(\ldots,\) \(dx^n_p : \TangentSpace{\Manifold{M}}{p} \to \Reals.\)
 The cotangent space is bundled to form the cotangent bundle \(\CotangentBundle{\Manifold{M}}.\)
-The set of smooth sections of the cotangent bundle is denoted \(\CoTangentSections{\Manifold{M}}\) whose elements \(\omega\in \CoTangentSections{\Manifold{M}}\) are the smooth one-forms of \(\Manifold{M}.\)
+The set of smooth sections of \(\CotangentBundle{\Manifold{M}}\) is denoted \(\CoTangentSections{\Manifold{M}}\) whose elements \(\omega\in \CoTangentSections{\Manifold{M}}\) are the smooth one-forms of \(\Manifold{M}.\)
 For \(k > 1,\) the space of \(k\)-forms at \(p\) is denoted \(\KFormSpaceAt{\Manifold{M}}{p}{k}.\)
 Smooth \(k\)-forms are constructed in the same manner as smooth one-forms.
 The set of all smooth forms on \(\Manifold{M}\) is \(\FormSections{\Manifold{M}}.\)
@@ -354,7 +354,7 @@ This is a controlled-invariance requirement.
 When \(\Ideal{K}\) is differentially closed, \(\mathfrak{Z}(\Ideal{K})\) is computed with repeated Lie derivatives of the exact generators along \(f.\)
 %
 Given a foliation \(\Foliation{Z},\) the ideal \(\mathfrak{I}(\Foliation{Z})\) is used to identify whether or not \(\Foliation{Z}\) is a regular zero dynamics foliation.
-Asking whether \(\Foliation{Z}\) is a regular zero dynamics foliation is approximately equivalent to demanding that each leaf of \(\Foliation{Z}\) is transverse feedback linearizable.
+Asking whether \(\Foliation{Z}\) is a regular zero dynamics foliation is like demanding that each leaf of \(\Foliation{Z}\) is transverse feedback linearizable.
 % A minor modification of the algorithm presented by~\cite{dsouza_algorithm_2023} produces the outputs that define the regular zero dynamics foliation.
 %
 \begin{prop}
@@ -427,14 +427,14 @@ A regular zero dynamics foliation \(\Foliation{Z}\) is said to be tower-complete
 
 \subsection{Extension along a Regular Zero Dynamics Foliation}
 Regular zero dynamics foliations provide enough information to define a notion of dynamic extension.
-To any regular zero dynamics foliation of type \((\rho^0, \kappa)\) there is an output \(h: \Manifold{M} \to \Reals^{\rho^0}\) that has vector relative degree \(\kappa.\)
+To any regular zero dynamics foliation of type \((\rho^0, \kappa)\) there is an output \(h: \Manifold{M} \to \Reals^{\smash{\scriptscriptstyle\rho^0}}\) that has vector relative degree \(\kappa.\)
 This output defines a channel to \(\rho^0\) inputs.
 The dynamic extension of this channel is not a pure prolongation:
 the derivatives of \(h\) are driven by a function of the input and state.
-Write \(h = (h^1, \ldots, h^{\rho^0})\) and define virtual inputs,
+Write \(h = (h^1, \ldots, h^{\smash{\scriptscriptstyle\rho^0}})\) and define virtual inputs,
 %, for every \(1 \leq j \leq \rho_0,\) by setting,
 \[
-  \LieOperator_{f}^{\kappa_j} h^j = \alpha(x, u) \asdefine
+  \LieOperator_{f}^{\smash{\scriptscriptstyle\kappa_j}} h^j = \alpha(x, u) \asdefine
   v^j,
   \quad 
   1 \leq j \leq \rho^0.
@@ -597,7 +597,7 @@ In this section, we reformulate the principle into the language of categories.
 %
 \begin{prin}[Optimality Principle]
   \label{principle:bellman}
-  An optimal policy has the property that, whatever the initial state and initial decisions are, the remaining decisions must constitute an optimal policy with regard to the state resulting from the first decisions.
+  An optimal policy\\ has the property that, whatever the initial state and initial decisions are, the remaining decisions must constitute an optimal policy with regard to the state resulting from the first decisions.
 \end{prin}
 
 \subsection{The Optimal Arrow}
@@ -900,13 +900,12 @@ In the case where the number of arrows to any given object is finite, search alg
 \end{figure}
 %
 
-Dynamic programming can be augmented with a cost-to-come heuristic \(H: \Category{X} \to \Reals\) which assigns a lower-bound estimate on the optimal cost to arrive at any given object.
+Dynamic programming can be augmented with a cost-to-come heuristic \(H: \Category{X} \to \Reals\) which assigns a lower-bound on the optimal cost to arrive at any given object.
 % assigns a cost to an object placing a lower-bound on the optimal cost to arrive to said object.
 The heuristic does not change the optimal arrows from \(\Category{G}\) as long as it is zero for all objects in \(\Category{G}\) and positive otherwise.
 The heuristic acts via the heuristic-adjusted loss, \(L_H(a, b)\) \(\defineas\) \(L(a, b)\) \(-\) \(H(a)\) \(+\) \(H(b),\) which is functorial if \(L\) is functorial.
-The category must be restricted to those arrows where the heuristic is non-increasing, i.e. \(H(b)\) \(-\) \(H(a)\) \(\geq\) \(0.\)
-Principle~\ref{principle:optimality} then holds.
-When the number of arrows to any given object is finite, shortest-path algorithms are informed by the heuristic.
+The category must be restricted to those arrows where the heuristic is non-increasing, i.e. \(H(b)\) \(-\) \(H(a)\) \(\geq\) \(0,\) so that Principle~\ref{principle:optimality} holds.
+When applicable, shortest-path algorithms are informed by the heuristic.
 
 The category of regular nonlinear control systems is not finite:
 the number of arrows into a system is infinite.
@@ -964,7 +963,7 @@ To construct the heuristic, we need a measure of how far away an ideal is from i
   \)
 \end{defn}
 %
-The \(\Defect(\langle \Ideal{I}^{\smash{\scriptscriptstyle(k)}}, dt \rangle)\) measures the dimension of the space of forms that fail to close under exterior derivative and thus acts as an obstruction to the integrability condition.
+The \(\Defect(\langle\Ideal{I}^{\smash{\scriptscriptstyle(k)}},\) \(dt\rangle)\) quantifies the space of forms that aren't differentially closed and thus acts as an obstruction to the integrability condition.
 This motivates a heuristic.
 %
 \begin{defn}
@@ -982,9 +981,9 @@ This motivates a heuristic.
   \)
 \end{defn}
 %
-The \(\Lid(\cdot)\) is zero (and only zero) for feedback linearizable systems because of~\eqref{eqn:involutivity}.
-For dynamically feedback linearizable systems, the \(\Lid(\cdot)\) puts a best-case, lower-bound on how many dynamic extensions must occur to bring the system into linearizability.
-
+The \(\Lid(\cdot)\) is zero and only zero for feedback linearizable systems because of~\eqref{eqn:involutivity}.
+For dynamically feedback linearizable systems, the \(\Lid(\cdot)\) puts a best-case, lower-bound on how many extensions bring the system into linearizability.
+%
 Minimizing \(\Lid(\cdot)\) is tricky because, when integrability is achieved on an ideal \(k,\) the defect may spike in the ideal \(k+1.\)
 Still, eliminating the defect in a fixed ideal often minimizes the leading defect.
 Let \(k^\star > 0\) be the index for \(\Lid(\Manifold{M}, \Ideal{I}^{\smash{\scriptscriptstyle(0)}}).\) 
@@ -1037,12 +1036,12 @@ Solving this problem identifies the outputs \(v^i\) of uniform vector relative d
 into involution.
 
 The loss \(L\) adjusted by the heuristic \(H \defineas \Lid\) determines the loss \(L_H\) which guides the search for a minimal dynamic extension towards resolving~\eqref{eqn:involutivity}.
-Recall that the arrows of the category only need to be restricted to extensions that do not make the heuristic \emph{worse}:
-the restricted category includes extensions that neither improve nor degrade the defect although improvements are favoured by search algorithms.
+Recall that the arrows of the category are restricted to extensions that do not make the heuristic \emph{worse}:
+the restricted category has extensions that neither improve nor degrade the defect although improvements are favoured by search algorithms.
 % Let us turn to a few, simple examples to see the heuristic in action.
 
 \subsection{Examples}
-Computation is supported by the~\cite{maple_2025} software.
+Computation was done in~\cite{maple_2025}.
 Worksheets are found on Github at \url{github.com/rollends/deds/tree/main/examples/deds-conference} with a package that executes the search in the finite case.
 
 \subsubsection{Example 1.}
@@ -1079,9 +1078,9 @@ The loss of a primitive arrow is minimized by selecting the system that is only 
 In this case, the leading defect occurs at \(\langle \Ideal{I}^{\smash{\scriptscriptstyle(1)}}, dt\rangle\) where the quotient \(\langle \Ideal{I}^{\smash{\scriptscriptstyle(1)}}, dt\rangle\) with \(\langle \Ideal{I}^{\smash{\scriptscriptstyle(1)}}, dt\rangle^{\smash{\scriptscriptstyle(1)}}\) is generated by forms, \(dx\) \(-\) \(\cot(\gamma) dy,\) and \(dz\) \(-\) \(\cot(\alpha) dw.\)
 The \(\Lid(\Manifold{M}, \Ideal{I}^{\smash{\scriptscriptstyle(0)}}) = 2.\)
 We seek an exact one-form that, upon bringing into this ideal through a one-step dynamic extension, removes the defect.
-Prolonging an exact form \(dh\) in \(\langle \Ideal{I}^{\smash{\scriptscriptstyle(0)}}, dt \rangle\) to \(\langle \Ideal{I}^{\smash{\scriptscriptstyle(1)}}, dt\rangle\) (that wasn't there originally) involves extending a virtual input once;
-equivalently, this is an extension along a regular zero dynamics foliation induced by output \(h.\)
-The exact one-form \(d\gamma\) \(\in\) \(\langle \Ideal{I}^{\smash{\scriptscriptstyle(0)}}, dt \rangle\) is one such candidate.
+Prolonging an exact form \(dh\) in \(\langle \Ideal{I}^{\smash{\scriptscriptstyle(0)}}, dt \rangle\) to \(\langle \Ideal{I}^{\smash{\scriptscriptstyle(1)}}, dt\rangle\) (that wasn't there originally) involves extending a virtual input,
+i.e., perform an extension along a regular zero dynamics foliation induced by \(h.\)
+The form \(d\gamma\) \(\in\) \(\langle \Ideal{I}^{\smash{\scriptscriptstyle(0)}}, dt \rangle\) is one such candidate.
 Using Definition~\ref{def:vector-relative-degree}, determine that \(\gamma\) has relative degree one.
 Perform a one-step extension along its regular zero dynamics foliation to find a new differential constraint,
 \begin{equation}
@@ -1092,14 +1091,14 @@ Perform a one-step extension along its regular zero dynamics foliation to find a
       &= - u^3 e^{u^4} \sin\alpha d\alpha + du^2
       + (u^4 e^{u^3} + e^{u^4}\cos\alpha) du^3\\
       &+ (e^{u^3} + u^3 e^{u^4}\cos\alpha) du^4
-      - q {dt},
+      - q {dt}
   \end{aligned}
   }}}.
 \end{equation}
 A virtual input can replace \(u^2\) and be extended to form the new input \(q.\)
-This defines a new manifold with additional coordinate \(q\) and the constraint~\eqref{eqn:ex:1:constraint}.
+This defines a new manifold with a new coordinate \(q\) and constraint~\eqref{eqn:ex:1:constraint}.
 This extended system satisfies the feedback linearizability conditions~\eqref{eqn:involutivity} and~\eqref{eqn:controllability}.
-The dynamic programming algorithm terminates since other extensions necessarily have a larger cost.
+Dynamic programming terminates here since other extensions necessarily have a larger cost.
 
 \subsubsection{Example 2.}
 Consider a variation of the previous system,
@@ -1132,12 +1131,16 @@ The search terminates here.
 
 \section{Conclusion}
 Facing the inevitable computational wall for dynamic feedback linearization, we presented a dynamic search for the dynamic extension to linearizability.
-The approach uses regular zero dynamics manifolds to characterize an optimization category of nonlinear control systems.
+The approach builds an optimization category of nonlinear control systems.
 The search can be made finite via restriction.
-Otherwise, a heuristic guides the search to arrows that are likely to arrive from a feedback linearizable system.
-This raises a number of interesting questions.
-Is there a way to form equivalence classes of arrows to render the search finite in general?
-If not, is it possible to identify the optimal heuristic and systematically generate a sequence of \emph{systems of} linear PDEs through the functional equation?
+Otherwise, a heuristic guides the search to arrows that are likely from a feedback linearizable system.
+This raises a couple of interesting questions.
+Can we form equivalence classes of arrows to render the search finite in general?
+That is, is there a functor from all control systems to a countable set of \emph{classes} of systems, thus making the search a finite exploration of arrows to a specific group of linearizable systems determined by their controllability index?
+If not, can we find the optimal heuristic and systematically generate a sequence of PDEs using~\eqref{eqn:DP-Classic}?
+An extension system is entirely characterized by a nonlinear feedback transformation \(\beta\) and indices corresponding to the extension order.
+Thus, contraints on \(\beta\) may arise using~\eqref{eqn:DP-Classic}.
+
 %The presented approach also lends itself to other interesting problems, like identifying a minimal dynamic extension to turn a zero dynamics manifold into a regular zero dynamics manifold (``dynamic'' transverse feedback linearization).
 %The loss function may also be modified to encode design constraints on the dynamic precompensator.
 
