@@ -30,7 +30,7 @@ $(DFLCONFPAPER): $(DFLCONFPAPERSOURCE) $(DFLCONFPAPERDEPENDS)
 
 DFLCONFPAPER_SLIDES 		:= dfl-conf-paper-slides.pdf
 DFLCONFPAPERSOURCE_SLIDES	:= dfl-conf-paper-slides.tex
-DFLCONFPAPERDEPENDS_SLIDES	:= dflconfbib.bib figures.sty notation.sty
+DFLCONFPAPERDEPENDS_SLIDES	:= dflconfbib.bib figures.sty notation.sty figures/example-2-pure-search.pdf figures/example-2-pure-search-answer.png figures/cat-sad-1.png figures/nod.png
 $(DFLCONFPAPER_SLIDES): $(DFLCONFPAPERSOURCE_SLIDES) $(DFLCONFPAPERDEPENDS_SLIDES)
 	mkdir -p $(BUILDDIRECTORY)/$@/
 	cp $^ $(BUILDDIRECTORY)/$@/
@@ -40,6 +40,11 @@ $(DFLCONFPAPER_SLIDES): $(DFLCONFPAPERSOURCE_SLIDES) $(DFLCONFPAPERDEPENDS_SLIDE
 	cd $(BUILDDIRECTORY)/$@/ && $(TEXFOT) $(XELATEX) -jobname=$(basename $@) root.tex
 	cp $(BUILDDIRECTORY)/$@/$@ $@
 
+figures/%.png: figures/%.gif figures/%.gif.frame
+	convert figures/$*.gif -coalesce \( -clone $(shell cat figures/$*.gif.frame) -write $@ \) null:
+
+figures/%.gif: figures/%.gif.url
+	curl -f -o $@ `cat $<`
 
 submission-$(DFLCONFPAPER): $(BUILDDIRECTORY)/$(DFLCONFPAPER)/root.zip
 
