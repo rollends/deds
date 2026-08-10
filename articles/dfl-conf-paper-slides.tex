@@ -3,6 +3,8 @@
 \mode<presentation>
 \usetheme{Malmoe}
 
+\newtheorem{principle}[]{Principle}
+
 \usepackage[T1]{fontenc}
 \usepackage{lmodern}
 
@@ -16,6 +18,14 @@
 \date[MTNS '26]{27th International Symposium on Mathematical Theory of Networks and Systems}
 
 \begin{document}
+
+\begin{frame}
+  \frametitle{Things To Think About}
+  \begin{center}
+    \item{Our view on Dynamic Feedback Linearization.}
+    \item{Our view on Dynamic Programming.}
+  \end{center}
+\end{frame}
 
 \section{A Brief on Feedback Linearization}
 
@@ -314,10 +324,17 @@
 \section{The Optimality Principle}
 
 \begin{frame}
-  \begin{quote}
-    An optimal policy has the property that, whatever the initial state and initial decisions are, the remaining decisions must constitute an optimal policy with regard to the state resulting from the first decisions.
-    --- Bellman, 1954
-  \end{quote}
+  \begin{columns}
+    \begin{column}{0.8\textwidth}
+      \begin{quote}
+        An optimal policy has the property that, whatever the initial state and initial decisions are, the remaining decisions must constitute an optimal policy with regard to the state resulting from the first decisions.\\
+        \hfill--- Bellman, 1954
+      \end{quote}
+    \end{column}
+    \begin{column}{0.2\textwidth}
+      \includegraphics[width=\linewidth]{bellman.jpg}
+    \end{column}
+  \end{columns}
 \end{frame}
 
 \begin{frame}
@@ -536,10 +553,10 @@
     \end{quote}
   }
   \only<2->{
-    \begin{theorem}[Optimality Principle]
+    \begin{principle}[Optimality Principle]
       If \(f\) \(\in\) \(\OptSet(a, c)\) is a \emph{composite} optimal arrow that decomposes into \(f\) \(=\) \only<2>{\(h\)}\only<3->{{\color{red}\(h_*\)}} \(\circ\) \(g\) for some \(g\) \(\in\) \(\HomSet(a, b),\) \only<2>{\(h\)}\only<3->{{\color{red}\(h_*\)}} \(\in\) \(\HomSet(b, c)\) and \(b\) \(\in\) \(\Category{X},\)
       then \only<2>{\(h\)}\only<3->{{\color{red}\(h_*\)}} \(\in\) \(\OptSet(b, c)\) is an optimal arrow.
-    \end{theorem}
+    \end{principle}
   }
   \begin{center}
     \begin{tikzpicture}[x = 1cm, y = 1cm, node font={\tiny}]
@@ -848,10 +865,12 @@
           slide2/.style={}}
       }
 
-      \node[category object] (A) {};
-      \node[category object, above right = 2 of A.center] (C1) {};
-      \node[category object, below right = 2 of A.center] (C2) {};
-      \node[category object, right = 4 of A.center] (B) {};
+      \node[category object] (A) {};      
+      \node[coordinate, right=3 of A] (Ac) {};
+      \node[category object, above right = 2 of Ac.center] (C1) {};
+      \node[category object, below right = 2 of Ac.center] (C2) {};
+      \node[category object, right = 4 of Ac.center] (B) {};
+
       \draw[]
         (B) 
           node[below right] {\(c\)};
@@ -1020,12 +1039,13 @@
     \begin{tikzpicture}[x = 0.7cm, y = 0.7cm, node font={\tiny}]
 
       \node[category object, transparent] (A) {};
-      \node[category object, above right = 2 of A.center] (C1) {};
-      \node[category object, below right = 2 of A.center] (C2) {};
-      \node[category object, right = 4 of A.center] (B) {};
+      \node[coordinate, right=3 of A] (Ac) {};
+      \node[category object, above right = 2 of Ac.center] (C1) {};
+      \node[category object, below right = 2 of Ac.center] (C2) {};
+      \node[category object, right = 4 of Ac.center] (B) {};
       \draw[]
         (B) 
-          node[below right] {\(c, H(c)\)};
+          node[below right] {\(c\)};
       \draw[category arrow, - Latex, transparent]
         (A)
           node[below left] {\(a\)}
@@ -1041,7 +1061,7 @@
       
       \draw[]
         (C1)
-        node[above left] {\(b_1,\) \(H(b_1)\)};
+        node[above] {\(b_1\)};
 
       \draw[category arrow, - Latex, transparent]
         (A)
@@ -1057,7 +1077,7 @@
 
       \draw[]
         (C2)
-        node[below left] {\(b_2,\) \(H(b_2)\)};
+        node[below] {\(b_2\)};
 
       \fill[color=Black!15!White, blend mode=multiply, pattern=dots]
         (C1.center)
@@ -1183,7 +1203,26 @@
           ..
           controls ($0.5*(A) + 0.5*(C1) + (1, -1)$) and ($0.5*(A) + 0.5*(C2) + (0.1, 0.15)$)
           ..
+          node[midway, coordinate] (G1) {}
         ($0.5*(A) + 0.5*(C2)$);
+    
+      \draw[thick, dashed, color=Green, - Latex]
+        ($0.5*(A) + 0.5*(C2)$)
+          --
+          node[midway, above, sloped] {\(H(b_2)\)}
+        (C2);
+
+      \draw[thick, dashed, color=Green, - Latex]
+        ($0.5*(A) + 0.5*(C1)$)
+          --
+          node[midway, above, sloped] {\(H(b_1)\)}
+        (C1);
+
+      \draw[thick, dashed, color=Green, - Latex]
+        (G1)
+          --
+          node[midway, above, sloped] {\(H(c)\)}
+        (B);
     \end{tikzpicture}
   \end{center}
 
@@ -1271,7 +1310,15 @@
         \node[category object, left = 4 of u2] (u22) {};
         \draw[]
           (u22)
-          node[above right] {};
+          node[left] {%
+            \(%
+              \begin{aligned}
+                dx &= f(x, u)\,dt\\
+                du^2 &= u^2_{(1)}\,dt \\
+                \beta_{x^k}\,dx^k + \beta_{u^k}\, du^k&= u^k_{(1)}\,dt
+              \end{aligned}
+            \)
+          };
         \draw[]
           (u12)
           node[below left] {%
@@ -1283,18 +1330,19 @@
               \end{aligned}
             \)
           };
-          \draw[category arrow, - Latex]
-            (u12)
-              ..
-              controls ($(u12) + (2, -1)$) and ($(u1) + (-2, 1)$)
-              ..
-            (u1);
-          \draw[category arrow, - Latex]
-            (u12)
-              ..
-              controls ($(u12) + (2, 1)$) and ($(u2) + (-2, 1)$)
-              ..
-            (u2);
+        \draw[category arrow, - Latex]
+          (u12)
+            ..
+            controls ($(u12) + (2, -1)$) and ($(u1) + (-2, 1)$)
+            ..
+          (u1);
+        \draw[category arrow, - Latex]
+          (u12)
+            ..
+            controls ($(u12) + (2, 1)$) and ($(u2) + (-2, 1)$)
+            ..
+          (u2);
+            
       \end{scope}
       
       \node[coordinate, above left = 1 of u12] (FL) {};
@@ -1321,28 +1369,37 @@
           node[midway, coordinate] (B2) {}
         cycle;
 
-      \draw<1>[decorate, decoration=triangles]
+      \draw<1>[thick, dashed, color=Green, - Latex]
         (B1)
           --
           node[midway, above, sloped] {heuristic}
         (base);
       
-      \draw<2>[decorate, decoration=triangles]
-        (B1)
-          --
-          node[midway, above, sloped] {heuristic}
-        (u2);
-      \draw<2>[decorate, decoration=triangles]
+      \draw<2>[thick, dashed, color=Green, - Latex]
         (B2)
           --
           node[midway, above, sloped] {heuristic}
         (u1);
-
-      \draw<3>[decorate, decoration=triangles]
+      \draw<2>[category arrow, thick, dashed, color=Green, - Latex]
+        (u22)
+          ..
+          controls ($(u22) + (2, -2)$) and ($(u2) + (-2, -2)$)
+          ..
+          node[pos=0.75, below, sloped] {heuristic}
+        (u2);
+      \draw<3>[category arrow, thick, - Latex]
+        (u22)
+          ..
+          controls ($(u22) + (2, -2)$) and ($(u2) + (-2, -2)$)
+          ..
+          node[pos=0.75, below, sloped] {minimizes heuristic}
+        (u2);
+      \draw<3>[thick, dashed, color=Green, - Latex]
         (B1)
           --
           node[midway, above, sloped] {heuristic}
         (u12);
+
     \end{tikzpicture}
   \end{center}
 \end{frame}
@@ -1467,15 +1524,23 @@
         \begin{aligned}
           \dot{x} &= u^1\,\cos(\theta + z)\\
           \dot{y} &= u^1\,\sin(\theta + z)\\
-          \dot{\theta} &= u^2 dt\\
+          \dot{\theta} &= u^2\\
+          \only<1-2>{
           \dot{z} &= u^3\, e^{u^4}\, \cos(\beta)\\
           \dot{w} &= u^3\, e^{u^4}\, \sin(\beta)\\
           \dot{\beta} &= u^4\, e^{u^3}
+          }
+          \only<3->{
+          \dot{z} &= {\color{red} \bar{u}^3}\\
+          \dot{w} &= {\color{red} \bar{u}^3\, \tan(\beta)}\\
+          \dot{\beta} &= u^4\, {\color{red} \exp(\bar{u}^3\, e^{-u^4}\, \sec\beta)}
+          }
         \end{aligned}
       \]
     \end{column}
     \begin{column}{0.6\textwidth}
       \begin{itemize}
+        \pause
         \item{The heuristic, when minimized, demands that the outputs
           \[
             \theta, z
@@ -1492,7 +1557,7 @@
 
 \begin{frame}
   \frametitle{An Example again...}
-  The precompensated system becomes,
+  The precompensated system becomes, \only<2>{feedback linearizble.}
   \begin{columns}
     \begin{column}{0.4\textwidth}
       \[
@@ -1503,16 +1568,25 @@
           \dot{z} &= {\color{red} \bar{u}^3}\\
           \dot{w} &= {\color{red} \bar{u}^3\, \tan(\beta)}\\
           \dot{\beta} &= u^4\, {\color{red} \exp(\bar{u}^3\, e^{-u^4}\, \sec\beta)}\\
-          \dot{u}^2 &= u^2_{(1)}\\
-          \dot{\bar{u}}^3 &= \bar{u}^3_{(1)}
+          \color{blue} \dot{u}^2 &\color{blue}= \color{blue} u^2_{(1)}\\
+          \color{blue} \dot{\bar{u}}^3 &\color{blue}= \color{blue} \bar{u}^3_{(1)}
         \end{aligned}
       \]
     \end{column}
     \begin{column}{0.6\textwidth}
       \pause
-      feedback linearizable!
+      The outputs are,
+      {\tiny%
+      \[
+        \begin{aligned}
+          h^1 &= \theta\\
+          h^2 &= z\\
+          h^3 &= w\\
+          h^4 &= (y\,\tan(z) + x)\,\tan(\theta)+\tan(z)\,x - y
+        \end{aligned}
+      \]}
       \begin{center}
-        \includegraphics[height=4cm]{nod.png}
+        \includegraphics[height=2cm]{nod.png}
       \end{center}
     \end{column}
   \end{columns}
