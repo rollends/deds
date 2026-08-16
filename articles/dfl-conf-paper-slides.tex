@@ -273,7 +273,7 @@
     \begin{column}{0.6\textwidth}
       \begin{itemize}
         \item{Four input system}
-        \item{\textbf{Not} feedback linearizable.}\pause
+        \item{\textbf{Not} feedback linearizable.}
         \item{Try the easy thing...just add derivatives of \(u^1,\) \(\ldots,\) \(u^4\)?}
       \end{itemize}
     \end{column}
@@ -343,11 +343,7 @@
   %
   \begin{center}
     \begin{tikzpicture}[x = 1cm, y = 1cm]
-      \only<1>{
-        \tikzset{%
-          slide2/.style={transparent}}
-      }
-      \only<2->{
+      \only<1->{
         \tikzset{%
           slide2/.style={}}
       }
@@ -546,29 +542,15 @@
 
 \begin{frame}
   \frametitle{The Optimality Principle Revisited}
-  \only<1>{
-    \begin{quote}
-      An optimal policy has the property that, whatever the initial state and initial decisions are, the remaining decisions must constitute an optimal policy with regard to the state resulting from the first decisions.
-      --- Bellman, 1954
-    \end{quote}
-  }
-  \only<2->{
+  
     \begin{principle}[Optimality Principle]
-      If \(f\) \(\in\) \(\OptSet(a, c)\) is a \emph{composite} optimal arrow that decomposes into \(f\) \(=\) \only<2>{\(h\)}\only<3->{{\color{red}\(h_*\)}} \(\circ\) \(g\) for some \(g\) \(\in\) \(\HomSet(a, b),\) \only<2>{\(h\)}\only<3->{{\color{red}\(h_*\)}} \(\in\) \(\HomSet(b, c)\) and \(b\) \(\in\) \(\Category{X},\)
-      then \only<2>{\(h\)}\only<3->{{\color{red}\(h_*\)}} \(\in\) \(\OptSet(b, c)\) is an optimal arrow.
+      If \(f\) \(\in\) \(\OptSet(a, c)\) is a \emph{composite} optimal arrow that decomposes into \(f\) \(=\) \only<1>{\(h\)}\only<2->{{\color{red}\(h_*\)}} \(\circ\) \(g\) for some \(g\) \(\in\) \(\HomSet(a, b),\) \only<1>{\(h\)}\only<2->{{\color{red}\(h_*\)}} \(\in\) \(\HomSet(b, c)\) and \(b\) \(\in\) \(\Category{X},\)
+      then \only<1>{\(h\)}\only<2->{{\color{red}\(h_*\)}} \(\in\) \(\OptSet(b, c)\) is an optimal arrow.
     \end{principle}
-  }
+
   \begin{center}
     \begin{tikzpicture}[x = 1cm, y = 1cm, node font={\tiny}]
       \only<1>{
-        \tikzset{%
-          g/.style={},
-          hstar/.style={},
-          h/.style={},
-          h_circ_g/.style={},
-          hstar_circ_g/.style={}}
-      }
-      \only<2>{
         \tikzset{%
           g/.style={opacity=0.2},
           hstar/.style={opacity=0.2},
@@ -576,7 +558,7 @@
           h_circ_g/.style={},
           hstar_circ_g/.style={color=red}}
       }
-      \only<3>{
+      \only<2->{
         \tikzset{%
           g/.style={opacity=0.2},
           hstar/.style={color=red},
@@ -1235,7 +1217,7 @@
 
 \section{The Dynamic Search for the Minimal Dynamic Extension}
 
-\begin{frame}
+\begin{frame}[label=Perspective]
   \frametitle{A New Perspective}
   \begin{center}
     \begin{tikzpicture}[x = 1cm, y = 1cm, node font={\tiny}]
@@ -1249,7 +1231,7 @@
           slide2/.style={},
           slide3/.style={transparent}}
       }
-      \only<3>{
+      \only<3->{
         \tikzset{%
           slide2/.style={},
           slide3/.style={}}
@@ -1387,14 +1369,14 @@
           ..
           node[pos=0.75, below, sloped] {heuristic}
         (u2);
-      \draw<3>[category arrow, thick, - Latex]
+      \draw<3->[category arrow, thick, - Latex]
         (u22)
           ..
           controls ($(u22) + (2, -2)$) and ($(u2) + (-2, -2)$)
           ..
           node[pos=0.75, below, sloped] {minimizes heuristic}
         (u2);
-      \draw<3>[thick, dashed, color=Green, - Latex]
+      \draw<3->[thick, dashed, color=Green, - Latex]
         (B1)
           --
           node[midway, above, sloped] {heuristic}
@@ -1408,6 +1390,9 @@
   \titlepage
 \end{frame}
 
+% \againframe<4>{Perspective}
+
+\begin{comment}
 \begin{frame}
   \frametitle{What my Article Does}
   \begin{itemize}
@@ -1515,6 +1500,7 @@
     \end{tikzpicture}
   \end{center}
 \end{frame}
+\end{comment}
 
 \begin{frame}
   \frametitle{An Example again...}
