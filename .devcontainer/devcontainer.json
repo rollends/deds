@@ -15,7 +15,7 @@
         }
     },
     "mounts": [
-        "source=vscode-server-cache.rollends.research-container.v2.1,target=/home/.vscode-server,type=volume",
+        "source=vscode-server-cache.rollends.research-container.v2.2,target=/home/.vscode-server,type=volume",
         "source=${localEnv:HOME}/.ssh/,target=/home/ubuntu/.ssh/,type=bind,readonly",
         "source=${localEnv:HOME}/.gnupg/,target=/home/ubuntu/.gnupg/,type=bind"
     ],
