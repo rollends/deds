@@ -3,6 +3,8 @@
 \mode<presentation>
 \usetheme{Malmoe}
 
+\newtheorem{principle}[]{Principle}
+
 \usepackage[T1]{fontenc}
 \usepackage{lmodern}
 
@@ -12,15 +14,18 @@
 \usepackage{figures}
 
 \title{The Dynamic Search for the Minimal Dynamic Extension}
-\author[D'Souza, R. S.]{Rollen S. D'Souza\\\texttt{research@rollends.ca}}
+\author[D'Souza, R. S.]{\texorpdfstring{Rollen S. D'Souza\\\url{research@rollends.ca}}{Rollen S. D'Souza <research@rollends.ca>}}
 \date[MTNS '26]{27th International Symposium on Mathematical Theory of Networks and Systems}
 
-\hypersetup{
-  pdfauthor={Rollen S. D'Souza},
-  pdftitle={The Dynamic Search for the Minimal Dynamic Extension}
-}
-
 \begin{document}
+
+\begin{frame}
+  \frametitle{Things To Think About}
+  \begin{center}
+    \item{Our view on Dynamic Feedback Linearization.}
+    \item{Our view on Dynamic Programming.}
+  \end{center}
+\end{frame}
 
 \section{A Brief on Feedback Linearization}
 
@@ -195,18 +200,141 @@
   \begin{center}
     \begin{tikzpicture}[x = 1cm, y = 1cm]
       
+      \node[at = {(0, 0)}] (v) {};
+
+      \node[system block, right = 1 of v] (Precompensator) {%
+        \(%
+          N(s) = \frac{1}{s^\kappa}\, V(s)%
+        \)
+      };
+
+      \node[system block, right = 1 of Precompensator] (FE) {%
+        \(\beta(x, \nu)\)
+      };
+      \node[below = 0.25 of FE.south] (FE2) {};
+      
+      \node[system block, right = 1 of FE] (System) {%
+        \(\dot{x} = f(x, u)\)%
+      };
+
+      \draw[system path, - Latex]
+        (v.base) 
+          -- node[above, midway] (midwayV) {\(v\)}
+        (Precompensator.west);
+
+      \draw[system path, - Latex]
+        (Precompensator.east) 
+          -- node[above, midway] {\(\nu\)}
+        (FE.west);
+        
+      \draw[system path, - Latex]
+        (FE.east)
+          -- node[above, midway] (midwayU) {\(u\)}
+        (System.west);
+
+      \draw[system path, - Latex]
+        (System.east) 
+          -- 
+        +(0.5, 0)
+          |-
+        (FE2.base)
+          --
+        (FE.south);
+
+      \fill[system area, blend mode=multiply, opacity=0.2]
+        ($(midwayV) + (0, 1)$) node[coordinate] (R1corner1) {}
+          rectangle node[coordinate] (R1) {}
+        ($(midwayU|-FE2)+(0,-1)$) node[coordinate] (R1corner2) {};
+
+      \draw[]
+        (R1|-R1corner2)
+        node[system area text, anchor=north]
+          {The Precompensator};
     \end{tikzpicture}
   \end{center}
   %
 \end{frame}
 
+\begin{frame}
+  \frametitle{An Example}
+  \begin{columns}
+    \begin{column}{0.4\textwidth}
+      \[
+        \begin{aligned}
+          \dot{x} &= u^1\,\cos(\theta + z)\\
+          \dot{y} &= u^1\,\sin(\theta + z)\\
+          \dot{\theta} &= u^2 dt\\
+          \dot{z} &= u^3\, e^{u^4}\, \cos(\beta)\\
+          \dot{w} &= u^3\, e^{u^4}\, \sin(\beta)\\
+          \dot{\beta} &= u^4\, e^{u^3}
+        \end{aligned}
+      \]
+    \end{column}
+    \begin{column}{0.6\textwidth}
+      \begin{itemize}
+        \item{Four input system}
+        \item{\textbf{Not} feedback linearizable.}
+        \item{Try the easy thing...just add derivatives of \(u^1,\) \(\ldots,\) \(u^4\)?}
+      \end{itemize}
+    \end{column}
+  \end{columns}
+\end{frame}
+
+\begin{frame}
+  \frametitle{An Example...of dread}
+  \begin{columns}
+    \begin{column}{0.5\textwidth}
+      \begin{center}
+        \begin{tikzpicture}[x = 1cm, y = 1cm]
+          \node[anchor={north east}, at={($(2/20*(20, 0) + 1/60*(0,20)$)}, rectangle, draw, fill=White, thick, yshift={-2cm}] {%
+            \includegraphics[height=3cm, page=20]{example-2-pure-search.pdf}%
+          };
+          \foreach \x in {19,...,1} {
+            \node[anchor={north east}, at={($(2/20*(\x, 0) + 1/60*(0,\x)$)}, rectangle, draw, fill=White, thick] {%
+              \includegraphics[height=3cm, page=\x]{example-2-pure-search.pdf}%
+            };
+          }
+        \end{tikzpicture}
+      \end{center}
+    \end{column}
+    \begin{column}{0.5\textwidth}
+      20 pgs of Maple and 120 distinct extensions later...
+      \pause
+      \begin{center}
+        \begin{tikzpicture}[x = 1cm, y = 1cm]
+          \node[] (Cat) {\includegraphics[height={4cm}]{cat-sad-1.png}};
+
+          \node[at={(Cat.center)}, anchor={north}, rotate={-6}] {\includegraphics[width={4cm}]{example-2-pure-search-answer.png}};
+        \end{tikzpicture}
+      \end{center}
+    \end{column}
+  \end{columns}
+\end{frame}
+
+\begin{frame}
+  \frametitle{The Trappings of a Search Problem}
+  \begin{itemize}
+    \item{Pure extension case amounts to a graph search.}\pause
+    \item{Searching from our system to a set of systems that have a property. \emph{How do we know what direction to search?}}\pause
+    \item{Pure Extensions of Input: better choices can be made per (L\'evine, 2025).}\pause
+    \item{In General: sometimes better choices can be made per (Nicolau and Respondek, 2025) and (Nicolau et. al, 2025).}
+  \end{itemize}
+\end{frame}
+
 \section{The Optimality Principle}
 
 \begin{frame}
-  \begin{quote}
-    An optimal policy has the property that, whatever the initial state and initial decisions are, the remaining decisions must constitute an optimal policy with regard to the state resulting from the first decisions.
-    --- Bellman, 1954
-  \end{quote}
+  \begin{columns}
+    \begin{column}{0.8\textwidth}
+      \begin{quote}
+        An optimal policy has the property that, whatever the initial state and initial decisions are, the remaining decisions must constitute an optimal policy with regard to the state resulting from the first decisions.\\
+        \hfill--- Bellman, 1954
+      \end{quote}
+    \end{column}
+    \begin{column}{0.2\textwidth}
+      \includegraphics[width=\linewidth]{bellman.jpg}
+    \end{column}
+  \end{columns}
 \end{frame}
 
 \begin{frame}
@@ -215,6 +343,11 @@
   %
   \begin{center}
     \begin{tikzpicture}[x = 1cm, y = 1cm]
+      \only<1->{
+        \tikzset{%
+          slide2/.style={}}
+      }
+
       \node[category object] (A) {};
       \node[category object, right = 2 of A.center] (B) {};
       \node[category object, right = 2 of B.center] (C) {};
@@ -254,18 +387,17 @@
           node [below, midway] {\(h\)}
         (C);
 
-      \only<2->{
-        \draw[category arrow, - Latex]
-          (A)
-            .. controls ($(A) + (1, 2)$) and ($(C)+(-1, 2)$) ..
-            node [above, midway] {\(h_* \circ g\)}
-          (C);
-        \draw[category arrow, - Latex]
-          (A)
-            .. controls ($(A) + (1, -2)$) and ($(C)+(-1, -2)$) ..
-            node [below, midway] {\(h \circ g\)}
-          (C);
-      }
+      \draw[category arrow, - Latex, slide2]
+        (A)
+          .. controls ($(A) + (1, 2)$) and ($(C)+(-1, 2)$) ..
+          node [above, midway] {\(h_* \circ g\)}
+        (C);
+      \draw[category arrow, - Latex, slide2]
+        (A)
+          .. controls ($(A) + (1, -2)$) and ($(C)+(-1, -2)$) ..
+          node [below, midway] {\(h \circ g\)}
+        (C);
+      
     \end{tikzpicture}
   \end{center}
 \end{frame}
@@ -410,29 +542,15 @@
 
 \begin{frame}
   \frametitle{The Optimality Principle Revisited}
-  \only<1>{
-    \begin{quote}
-      An optimal policy has the property that, whatever the initial state and initial decisions are, the remaining decisions must constitute an optimal policy with regard to the state resulting from the first decisions.
-      --- Bellman, 1954
-    \end{quote}
-  }
-  \only<2->{
-    \begin{theorem}[Optimality Principle]
-      If \(f\) \(\in\) \(\OptSet(a, c)\) is a \emph{composite} optimal arrow that decomposes into \(f\) \(=\) \only<2>{\(h\)}\only<3->{{\color{red}\(h_*\)}} \(\circ\) \(g\) for some \(g\) \(\in\) \(\HomSet(a, b),\) \only<2>{\(h\)}\only<3->{{\color{red}\(h_*\)}} \(\in\) \(\HomSet(b, c)\) and \(b\) \(\in\) \(\Category{X},\)
-      then \only<2>{\(h\)}\only<3->{{\color{red}\(h_*\)}} \(\in\) \(\OptSet(b, c)\) is an optimal arrow.
-    \end{theorem}
-  }
+  
+    \begin{principle}[Optimality Principle]
+      If \(f\) \(\in\) \(\OptSet(a, c)\) is a \emph{composite} optimal arrow that decomposes into \(f\) \(=\) \only<1>{\(h\)}\only<2->{{\color{red}\(h_*\)}} \(\circ\) \(g\) for some \(g\) \(\in\) \(\HomSet(a, b),\) \only<1>{\(h\)}\only<2->{{\color{red}\(h_*\)}} \(\in\) \(\HomSet(b, c)\) and \(b\) \(\in\) \(\Category{X},\)
+      then \only<1>{\(h\)}\only<2->{{\color{red}\(h_*\)}} \(\in\) \(\OptSet(b, c)\) is an optimal arrow.
+    \end{principle}
+
   \begin{center}
     \begin{tikzpicture}[x = 1cm, y = 1cm, node font={\tiny}]
       \only<1>{
-        \tikzset{%
-          g/.style={},
-          hstar/.style={},
-          h/.style={},
-          h_circ_g/.style={},
-          hstar_circ_g/.style={}}
-      }
-      \only<2>{
         \tikzset{%
           g/.style={opacity=0.2},
           hstar/.style={opacity=0.2},
@@ -440,7 +558,7 @@
           h_circ_g/.style={},
           hstar_circ_g/.style={color=red}}
       }
-      \only<3>{
+      \only<2->{
         \tikzset{%
           g/.style={opacity=0.2},
           hstar/.style={color=red},
@@ -705,28 +823,42 @@
 
 \begin{frame}
   \frametitle{The Dynamic Programming Equation}
-  Optimality Principle (\& Functoriality) implies...
+  Optimality Principle \& Functoriality implies...
   \[
     J^*_L(a, c)
       =
           \min_{
             \begin{subarray}{c}
               b  \in \mathcal{X} \setminus \{a, c\}\\
-              g   \in \PrimSet(a, c)
+              g   \in \PrimSet(a, b)
             \end{subarray}
           }{
             \Loss(g) + J^*_L(b, c)
           }.
   \]
   \begin{center}
-    \begin{tikzpicture}[x = 0.7cm, y = 0.7cm]
-      \node[category object] (A) {};
-      \node[category object, above right = 2 of A.center] (C1) {};
-      \node[category object, below right = 2 of A.center] (C2) {};
-      \node[category object, right = 4 of A.center] (B) {};
+    \begin{tikzpicture}[x = 0.7cm, y = 0.7cm, node font={\tiny}]
+      \only<1>{
+        \tikzset{%
+          slide2/.style={transparent}}
+      }
+      \only<2>{
+        \tikzset{%
+          slide2/.style={}}
+      }
 
+      \node[category object] (A) {};      
+      \node[coordinate, right=3 of A] (Ac) {};
+      \node[category object, above right = 2 of Ac.center] (C1) {};
+      \node[category object, below right = 2 of Ac.center] (C2) {};
+      \node[category object, right = 4 of Ac.center] (B) {};
+
+      \draw[]
+        (B) 
+          node[below right] {\(c\)};
       \draw[category arrow, - Latex]
         (A)
+          node[below left] {\(a\)}
           ..
           controls ($0.5*(A) + 0.5*(C1)+(-0.25,-0.5)$) and ($0.5*(A) + 0.5*(C1)+(0,-0.5)$)
           ..
@@ -734,7 +866,8 @@
           ..
           controls ($0.5*(A) + 0.5*(C1)+(0,0.5)$) and ($(C1)+(-0.75, -0.25)$)
           ..
-        (C1);
+        (C1)
+          node[above left] {\(b_1\)};
 
       \draw[category arrow, - Latex]
         (A)
@@ -745,7 +878,8 @@
           ..
           controls ($0.5*(A) + 0.5*(C2)+(0.5,0)$) and ($(C2)+(-0.25, 0)$)
           ..
-        (C2);
+        (C2)
+          node[below left] {\(b_2\)};
 
       \fill[color=Black!15!White, blend mode=multiply, pattern=dots]
         (C1.center)
@@ -843,34 +977,618 @@
           ..
         (B);
 
+      
+      \fill[color=Green!25!White, blend mode=multiply, slide2]
+        ($0.5*(A) + 0.5*(C2)$)
+          ..
+          controls ($0.5*(A) + 0.5*(C2) + (-1, -1)$)
+          ..
+        ($(A) + (-2.0, 0.0)$)
+          ..
+          controls ($(A) + (-2.0, 0.0) + (-1, 1)$) and ($0.5*(A) + 0.5*(C1) + (-1, 1)$)
+          ..
+        ($0.5*(A) + 0.5*(C1)$)
+          ..
+          controls ($0.5*(A) + 0.5*(C1) + (1, -1)$) and ($0.5*(A) + 0.5*(C2) + (0.1, 0.15)$)
+          ..
+        ($0.5*(A) + 0.5*(C2)$);
+
+      \draw[color=Green, slide2, dashed, thick]
+        ($0.5*(A) + 0.5*(C2)$)
+          ..
+          controls ($0.5*(A) + 0.5*(C2) + (-1, -1)$)
+          ..
+        ($(A) + (-2.0, 0.0)$)
+          ..
+          controls ($(A) + (-2.0, 0.0) + (-1, 1)$) and ($0.5*(A) + 0.5*(C1) + (-1, 1)$)
+          ..
+        ($0.5*(A) + 0.5*(C1)$)
+          ..
+          controls ($0.5*(A) + 0.5*(C1) + (1, -1)$) and ($0.5*(A) + 0.5*(C2) + (0.1, 0.15)$)
+          ..
+        ($0.5*(A) + 0.5*(C2)$);
     \end{tikzpicture}
   \end{center}
   \pause
-  ...but what if you don't know what \(a\) is or how to get there?
+  ...but what if you don't know what the source object \(a\) (it is a subcategory).
 \end{frame}
 
 \begin{frame}
   \frametitle{Heuristic Searches}
-  Define a \defining{cost-to-come} heuristic \(H: \ObjectClass_\Category{X} \to \Reals\) that is a lower-bound estimator for the required loss to get to the goal (i.e. best-case cost).
+  A \defining{cost-to-come} heuristic \(H: \ObjectClass_\Category{X} \to \Reals\) is a lower-bound estimator for the loss to get from the source objects (i.e. best-case cost).
 
+  \begin{center}
+    \begin{tikzpicture}[x = 0.7cm, y = 0.7cm, node font={\tiny}]
 
-  Then we can define the heuristic-adjusted loss,
+      \node[category object, transparent] (A) {};
+      \node[coordinate, right=3 of A] (Ac) {};
+      \node[category object, above right = 2 of Ac.center] (C1) {};
+      \node[category object, below right = 2 of Ac.center] (C2) {};
+      \node[category object, right = 4 of Ac.center] (B) {};
+      \draw[]
+        (B) 
+          node[below right] {\(c\)};
+      \draw[category arrow, - Latex, transparent]
+        (A)
+          node[below left] {\(a\)}
+          ..
+          controls ($0.5*(A) + 0.5*(C1)+(-0.25,-0.5)$) and ($0.5*(A) + 0.5*(C1)+(0,-0.5)$)
+          ..
+        ($0.5*(A) + 0.5*(C1)$)
+          ..
+          controls ($0.5*(A) + 0.5*(C1)+(0,0.5)$) and ($(C1)+(-0.75, -0.25)$)
+          ..
+        (C1)
+          node[above left] {\(b_1\)};
+      
+      \draw[]
+        (C1)
+        node[above] {\(b_1\)};
+
+      \draw[category arrow, - Latex, transparent]
+        (A)
+          ..
+          controls ($(A)+(-0.15,-0.65)$) and ($0.5*(A) + 0.5*(C2)+(-0.5,0)$)
+          ..
+        ($0.5*(A) + 0.5*(C2)$)
+          ..
+          controls ($0.5*(A) + 0.5*(C2)+(0.5,0)$) and ($(C2)+(-0.25, 0)$)
+          ..
+        (C2)
+          node[below left] {\(b_2\)};
+
+      \draw[]
+        (C2)
+        node[below] {\(b_2\)};
+
+      \fill[color=Black!15!White, blend mode=multiply, pattern=dots]
+        (C1.center)
+          ..
+          controls ($(C1) + (0.15, 1.2)$) and ($0.5*(C1) + 0.5*(B) + (-1, 1.5)$)
+          ..
+        ($0.5*(C1) + 0.5*(B) + (0, 1)$)
+          ..
+          controls ($0.5*(C1) + 0.5*(B) + (1, 0.5)$) and ($(B) + (-0.15, 1)$)
+          ..
+        (B.center)
+          ..
+          controls ($(B) + (-0.65, -0.15)$) and ($0.5*(C1) + 0.5*(B) + (-0.25, -0.5) + (-0.5, -1)$)
+          ..
+        ($0.5*(C1) + 0.5*(B) + (-0.25, -0.5)$)
+          ..
+          controls ($0.5*(C1) + 0.5*(B) + (-0.25, -0.5) + (0.5, 1)$) and ($(C1) + (1, -1)$)
+          ..
+        (C1.center);
+      \fill[color=Black!8!White, blend mode=multiply]
+        (C1.center)
+          ..
+          controls ($(C1) + (0.15, 1.2)$) and ($0.5*(C1) + 0.5*(B) + (-1, 1.5)$)
+          ..
+        ($0.5*(C1) + 0.5*(B) + (0, 1)$)
+          ..
+          controls ($0.5*(C1) + 0.5*(B) + (1, 0.5)$) and ($(B) + (-0.15, 1)$)
+          ..
+        (B.center)
+          ..
+          controls ($(B) + (-0.65, -0.15)$) and ($0.5*(C1) + 0.5*(B) + (-0.25, -0.5) + (-0.5, -1)$)
+          ..
+        ($0.5*(C1) + 0.5*(B) + (-0.25, -0.5)$)
+          ..
+          controls ($0.5*(C1) + 0.5*(B) + (-0.25, -0.5) + (0.5, 1)$) and ($(C1) + (1, -1)$)
+          ..
+        (C1.center);
+
+      \draw[category arrow, - Latex, color=red]
+        (C1)
+          ..
+          controls ($(C1) + (0.45, 0.8)$) and ($0.5*(C1) + 0.5*(B) + (0.25, 0) + (0.5, 0.35)$)
+          ..
+        ($0.5*(C1) + 0.5*(B) + (0.25, 0)$)
+          ..
+          controls ($0.5*(C1) + 0.5*(B) + (0.25, 0) + (-0.5, -0.35)$) and ($(B) + (-0.4, 0)$)
+          ..
+        (B);
+
+      \fill[color=Black!15!White, blend mode=multiply, pattern=dots]
+        (C2.center)
+          ..
+          controls ($(C2) + (0.8, 0.2)$) and ($0.5*(C2) + 0.5*(B) + (0, 1) + (-0.5, 0)$)
+          ..
+        ($0.5*(C2) + 0.5*(B) + (0, 1)$)
+          ..
+          controls ($0.5*(C2) + 0.5*(B) + (0, 1) + (0.5, 0)$) and ($(B) + (-0.15, 0.3)$)
+          ..
+        (B.center)
+          ..
+          controls ($(B) + (-0.15, -0.65)$) and ($0.5*(C2) + 0.5*(B) + (0, -1) + (0.5, 0.5)$)
+          ..
+        ($0.5*(C2) + 0.5*(B) + (0, -1)$)
+          ..
+          controls ($0.5*(C2) + 0.5*(B) + (0, -1) + (-0.5, -0.5)$) and ($(C2) + (0.8, -0.3)$)
+          ..
+        (C2.center);
+      \fill[color=Black!8!White, blend mode=multiply]
+        (C2.center)
+          ..
+          controls ($(C2) + (0.8, 0.2)$) and ($0.5*(C2) + 0.5*(B) + (0, 1) + (-0.5, 0)$)
+          ..
+        ($0.5*(C2) + 0.5*(B) + (0, 1)$)
+          ..
+          controls ($0.5*(C2) + 0.5*(B) + (0, 1) + (0.5, 0)$) and ($(B) + (-0.15, 0.3)$)
+          ..
+        (B.center)
+          ..
+          controls ($(B) + (-0.15, -0.65)$) and ($0.5*(C2) + 0.5*(B) + (0, -1) + (0.5, 0.5)$)
+          ..
+        ($0.5*(C2) + 0.5*(B) + (0, -1)$)
+          ..
+          controls ($0.5*(C2) + 0.5*(B) + (0, -1) + (-0.5, -0.5)$) and ($(C2) + (0.8, -0.3)$)
+          ..
+        (C2.center);
+
+      \draw[category arrow, - Latex, color=red]
+        (C2)
+          ..
+          controls ($(C2) + (0.5, 0)$) and ($0.5*(C2) + 0.5*(B) + (-0.2, 0) + (-0.1, -0.4)$)
+          ..
+        ($0.5*(C2) + 0.5*(B) + (-0.2, 0)$)
+          ..
+          controls ($0.5*(C2) + 0.5*(B) + (-0.2, 0) + (0.1, 0.4)$) and ($(B) + (-0.5, 0.1)$)
+          ..
+        (B);
+
+      \fill[color=Green!25!White, blend mode=multiply]
+        ($0.5*(A) + 0.5*(C2)$)
+          ..
+          controls ($0.5*(A) + 0.5*(C2) + (-1, -1)$)
+          ..
+        ($(A) + (-2.0, 0.0)$)
+          ..
+          controls ($(A) + (-2.0, 0.0) + (-1, 1)$) and ($0.5*(A) + 0.5*(C1) + (-1, 1)$)
+          ..
+        ($0.5*(A) + 0.5*(C1)$)
+          ..
+          controls ($0.5*(A) + 0.5*(C1) + (1, -1)$) and ($0.5*(A) + 0.5*(C2) + (0.1, 0.15)$)
+          ..
+        ($0.5*(A) + 0.5*(C2)$);
+
+      \draw[color=Green, dashed, thick]
+        ($0.5*(A) + 0.5*(C2)$)
+          ..
+          controls ($0.5*(A) + 0.5*(C2) + (-1, -1)$)
+          ..
+        ($(A) + (-2.0, 0.0)$)
+          ..
+          controls ($(A) + (-2.0, 0.0) + (-1, 1)$) and ($0.5*(A) + 0.5*(C1) + (-1, 1)$)
+          ..
+        ($0.5*(A) + 0.5*(C1)$)
+          ..
+          controls ($0.5*(A) + 0.5*(C1) + (1, -1)$) and ($0.5*(A) + 0.5*(C2) + (0.1, 0.15)$)
+          ..
+          node[midway, coordinate] (G1) {}
+        ($0.5*(A) + 0.5*(C2)$);
+    
+      \draw[thick, dashed, color=Green, - Latex]
+        ($0.5*(A) + 0.5*(C2)$)
+          --
+          node[midway, above, sloped] {\(H(b_2)\)}
+        (C2);
+
+      \draw[thick, dashed, color=Green, - Latex]
+        ($0.5*(A) + 0.5*(C1)$)
+          --
+          node[midway, above, sloped] {\(H(b_1)\)}
+        (C1);
+
+      \draw[thick, dashed, color=Green, - Latex]
+        (G1)
+          --
+          node[midway, above, sloped] {\(H(c)\)}
+        (B);
+    \end{tikzpicture}
+  \end{center}
+
+  Define the heuristic-adjusted loss,
   \[
-    L_H(a, b) \defineas L(a,b) - H(a) + H(b)
+    L_H(b, c) \defineas L(b, c) + H(b) - H(c).
   \]
-  that remains functorial if \(L\) is!
-
-  Dynamic Programming still applies.
+  It is functorial if \(L\) is.
 \end{frame}
 
 \section{The Dynamic Search for the Minimal Dynamic Extension}
 
-\begin{frame}
-  \frametitle{A New Perspective}  
+\begin{frame}[label=Perspective]
+  \frametitle{A New Perspective}
+  \begin{center}
+    \begin{tikzpicture}[x = 1cm, y = 1cm, node font={\tiny}]
+      \only<1>{
+        \tikzset{%
+          slide2/.style={transparent},
+          slide3/.style={transparent}}
+      }
+      \only<2>{
+        \tikzset{%
+          slide2/.style={},
+          slide3/.style={transparent}}
+      }
+      \only<3->{
+        \tikzset{%
+          slide2/.style={},
+          slide3/.style={}}
+      }
+
+      \node[category object] (base) {};
+      \draw[]
+        (base)
+        node[below right] {%
+          \(%
+            \begin{aligned}
+              \dot{x} &= f(x, u)
+            \end{aligned}
+          \)
+        };
+      
+      \begin{scope}[slide2]
+        \node[category object, below left = 2 of base] (u1) {};
+        \node[category object, above = 3 of base] (u2) {};
+
+        \draw[]
+          (u1)
+          node[below] {%
+            \(%
+              \begin{aligned}
+                \dot{x} &= f(x, u)\\
+                \dot{u}^1 &= u^1_{(1)}
+              \end{aligned}
+            \)
+          };
+        \draw[]
+          (u2)
+          node[right] {%
+            \(%
+              \begin{aligned}
+                \dot{x} &= f(x, u)\\
+                \dot{u}^2 &= u^2_{(1)}
+              \end{aligned}
+            \)
+          };
+
+          \draw[category arrow, - Latex]
+            (u1)
+              ..
+              controls ($(u1) + (1, 0.3)$) and ($(base) + (-1, -0.3)$)
+              ..
+            (base);
+          \draw[category arrow, - Latex]
+            (u2)
+              ..
+              controls ($(u2) + (-1, -2)$) and ($(base) + (1, 1.5)$)
+              ..
+            (base);
+      \end{scope}
+      
+      \begin{scope}[slide3]
+        \node[category object, above left = 3 of u1] (u12) {};
+        \node[category object, left = 4 of u2] (u22) {};
+        \draw[]
+          (u22)
+          node[left] {%
+            \(%
+              \begin{aligned}
+                dx &= f(x, u)\,dt\\
+                du^2 &= u^2_{(1)}\,dt \\
+                \beta_{x^k}\,dx^k + \beta_{u^k}\, du^k&= u^k_{(1)}\,dt
+              \end{aligned}
+            \)
+          };
+        \draw[]
+          (u12)
+          node[below left] {%
+            \(%
+              \begin{aligned}
+                \dot{x} &= f(x, u)\\
+                \dot{u}^1 &= u^1_{(1)}\\
+                \dot{u}^2 &= u^2_{(1)}
+              \end{aligned}
+            \)
+          };
+        \draw[category arrow, - Latex]
+          (u12)
+            ..
+            controls ($(u12) + (2, -1)$) and ($(u1) + (-2, 1)$)
+            ..
+          (u1);
+        \draw[category arrow, - Latex]
+          (u12)
+            ..
+            controls ($(u12) + (2, 1)$) and ($(u2) + (-2, 1)$)
+            ..
+          (u2);
+            
+      \end{scope}
+      
+      \node[coordinate, above left = 1 of u12] (FL) {};
+
+      \filldraw[color=Green!25!White, blend mode=multiply, dashed, thick]
+        (FL)
+          ..
+          controls ($(FL) + (0.5, 1)$) and ($(FL) + (1, 2) + (0, -1)$)
+          ..
+          node[midway, coordinate] (B1) {}
+        ($(FL) + (1, 2)$)
+          ..
+          controls ($(FL) + (1, 2) + (0, 1)$) and ($(FL) + (-2, 3) + (1, 0.2)$)
+          ..
+        ($(FL) + (-2, 3)$)
+          node[below right, anchor={north west}, color=Green!25!Black] {\textbf{feedback linearizable}}
+          ..
+          controls ($(FL) + (-2, 3) + (-1, -0.2)$) and ($(FL) + (-2.5, -1.5) + (0.1, 1)$)
+          ..
+        ($(FL) + (-2.5, -1.5)$)
+          ..
+          controls ($(FL) + (-2.5, -1.5) + (-0.1, -1)$) and ($(FL) + (-0.5, -1)$)
+          ..
+          node[midway, coordinate] (B2) {}
+        cycle;
+
+      \draw<1>[thick, dashed, color=Green, - Latex]
+        (B1)
+          --
+          node[midway, above, sloped] {heuristic}
+        (base);
+      
+      \draw<2>[thick, dashed, color=Green, - Latex]
+        (B2)
+          --
+          node[midway, above, sloped] {heuristic}
+        (u1);
+      \draw<2>[category arrow, thick, dashed, color=Green, - Latex]
+        (u22)
+          ..
+          controls ($(u22) + (2, -2)$) and ($(u2) + (-2, -2)$)
+          ..
+          node[pos=0.75, below, sloped] {heuristic}
+        (u2);
+      \draw<3->[category arrow, thick, - Latex]
+        (u22)
+          ..
+          controls ($(u22) + (2, -2)$) and ($(u2) + (-2, -2)$)
+          ..
+          node[pos=0.75, below, sloped] {minimizes heuristic}
+        (u2);
+      \draw<3->[thick, dashed, color=Green, - Latex]
+        (B1)
+          --
+          node[midway, above, sloped] {heuristic}
+        (u12);
+
+    \end{tikzpicture}
+  \end{center}
 \end{frame}
 
 \begin{frame}
   \titlepage
+\end{frame}
+
+% \againframe<4>{Perspective}
+
+\begin{comment}
+\begin{frame}
+  \frametitle{What my Article Does}
+  \begin{itemize}
+    \item{Objects: Control systems; manifold \& differential system.}
+    \item{Arrows: Appropriately constrained projection \(\pi: \Manifold{M}_1 \to \Manifold{M}\); termed ``extension system''.}
+    \item{Propose a cost-to-come heuristic that measures how defective the differential system is.}
+  \end{itemize}
+    \begin{center}
+    \begin{tikzpicture}[x = 0.45cm, y = 0.45cm, node font={\tiny}]
+      \node[category object] (base) {};
+      \draw[]
+        (base)
+        node[below right] {%
+          \(%
+            \Manifold{M}, \Ideal{I}
+          \)
+        };
+
+        \node[category object, below left = 2 of base] (u1) {};
+        \node[category object, above = 3 of base] (u2) {};
+
+        \draw[]
+          (u1)
+          node[below] {%
+            \(%
+            \Manifold{M}_1, \Ideal{I}_1
+            \)
+          };
+        \draw[]
+          (u2)
+          node[right] {%
+            \(%
+            \Manifold{M}_2, \Ideal{I}_2
+            \)
+          };
+
+          \draw[category arrow, - Latex]
+            (u1)
+              ..
+              controls ($(u1) + (1, 0.3)$) and ($(base) + (-1, -0.3)$)
+              ..
+            (base);
+          \draw[category arrow, - Latex]
+            (u2)
+              ..
+              controls ($(u2) + (-1, -2)$) and ($(base) + (1, 1.5)$)
+              ..
+            (base);
+
+        \node[category object, above left = 3 of u1] (u12) {};
+        \node[category object, left = 4 of u2] (u22) {};
+        \draw[]
+          (u22)
+          node[above right] {%
+            \(%
+            \Manifold{M}_4, \Ideal{I}_4
+            \)
+          };
+        \draw[]
+          (u12)
+          node[below left] {%
+            \(\Manifold{M}_3, \Ideal{I}_3\)
+          };
+          \draw[category arrow, - Latex]
+            (u12)
+              ..
+              controls ($(u12) + (2, -1)$) and ($(u1) + (-2, 1)$)
+              ..
+            (u1);
+          \draw[category arrow, - Latex]
+            (u12)
+              ..
+              controls ($(u12) + (2, 1)$) and ($(u2) + (-2, 1)$)
+              ..
+            (u2);
+          \draw[category arrow, - Latex]
+            (u22)
+              ..
+              controls ($(u22) + (2, -2)$) and ($(u2) + (-2, -2)$)
+              ..
+            (u2);
+      
+      \node[coordinate, above left = 1 of u12] (FL) {};
+
+      \filldraw[color=Green!25!White, blend mode=multiply, dashed, thick]
+        (FL)
+          ..
+          controls ($(FL) + (0.5, 1)$) and ($(FL) + (1, 2) + (0, -1)$)
+          ..
+        ($(FL) + (1, 2)$)
+          ..
+          controls ($(FL) + (1, 2) + (0, 1)$) and ($(FL) + (-2, 3) + (1, 0.2)$)
+          ..
+        ($(FL) + (-2, 3)$)
+          node[below right, anchor={north west}, color=Green!25!Black] {\textbf{feedback linearizable}}
+          ..
+          controls ($(FL) + (-2, 3) + (-1, -0.2)$) and ($(FL) + (-2.5, -1.5) + (0.1, 1)$)
+          ..
+        ($(FL) + (-2.5, -1.5)$)
+          ..
+          controls ($(FL) + (-2.5, -1.5) + (-0.1, -1)$) and ($(FL) + (-0.5, -1)$)
+          ..
+        cycle;
+
+    \end{tikzpicture}
+  \end{center}
+\end{frame}
+\end{comment}
+
+\begin{frame}
+  \frametitle{An Example again...}
+  \begin{columns}
+    \begin{column}{0.4\textwidth}
+      \[
+        \begin{aligned}
+          \dot{x} &= u^1\,\cos(\theta + z)\\
+          \dot{y} &= u^1\,\sin(\theta + z)\\
+          \dot{\theta} &= u^2\\
+          \only<1-2>{
+          \dot{z} &= u^3\, e^{u^4}\, \cos(\beta)\\
+          \dot{w} &= u^3\, e^{u^4}\, \sin(\beta)\\
+          \dot{\beta} &= u^4\, e^{u^3}
+          }
+          \only<3->{
+          \dot{z} &= {\color{red} \bar{u}^3}\\
+          \dot{w} &= {\color{red} \bar{u}^3\, \tan(\beta)}\\
+          \dot{\beta} &= u^4\, {\color{red} \exp(\bar{u}^3\, e^{-u^4}\, \sec\beta)}
+          }
+        \end{aligned}
+      \]
+    \end{column}
+    \begin{column}{0.6\textwidth}
+      \begin{itemize}
+        \pause
+        \item{The heuristic, when minimized, demands the outputs
+          \[
+            \theta, z
+          \]
+          be ``extended'' once each.
+        }\pause
+        \item{
+          The extension of the output \(z\) results in a impure extension.
+        }
+      \end{itemize}
+    \end{column}
+  \end{columns}
+\end{frame}
+
+\begin{frame}
+  \frametitle{An Example again...}
+  The precompensated system becomes, \only<2>{feedback linearizble.}
+  \begin{columns}
+    \begin{column}{0.4\textwidth}
+      \[
+        \begin{aligned}
+          \dot{x} &= u^1\,\cos(\theta + z)\\
+          \dot{y} &= u^1\,\sin(\theta + z)\\
+          \dot{\theta} &= u^2 dt\\
+          \dot{z} &= {\color{red} \bar{u}^3}\\
+          \dot{w} &= {\color{red} \bar{u}^3\, \tan(\beta)}\\
+          \dot{\beta} &= u^4\, {\color{red} \exp(\bar{u}^3\, e^{-u^4}\, \sec\beta)}\\
+          \color{blue} \dot{u}^2 &\color{blue}= \color{blue} u^2_{(1)}\\
+          \color{blue} \dot{\bar{u}}^3 &\color{blue}= \color{blue} \bar{u}^3_{(1)}
+        \end{aligned}
+      \]
+    \end{column}
+    \begin{column}{0.6\textwidth}
+      \pause
+      The outputs are,
+      {\tiny%
+      \[
+        \begin{aligned}
+          h^1 &= \theta\\
+          h^2 &= z\\
+          h^3 &= w\\
+          h^4 &= (y\,\tan(z) + x)\,\tan(\theta)+\tan(z)\,x - y
+        \end{aligned}
+      \]}
+      \begin{center}
+        \includegraphics[height=2cm]{nod.png}
+      \end{center}
+    \end{column}
+  \end{columns}
+\end{frame}
+
+\begin{frame}
+  \frametitle{Final Thoughts}
+  \begin{itemize}
+    \item{The heuristic only sorts extensions. There are still infinitely many to consider. Can we:
+      \begin{itemize}
+        \item{make it finite up to an equivalence?}
+        \item{iterate on a family of solutions? (i.e. if both \(\theta\) and \(z\) are valid extensions, instead consider arbitrary \(F(\theta, z).\))}
+      \end{itemize}
+    }
+    \item{How do other methods fit in this framing?}
+  \end{itemize}
 \end{frame}
 
 \end{document}

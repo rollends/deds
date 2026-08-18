@@ -8,13 +8,25 @@
                 "ms-python.python",
                 "ms-python.black-formatter",
                 "ms-vscode-remote.remote-containers",
-                "ms-toolsai.jupyter"
+                "ms-toolsai.jupyter",
+                "haskell.haskell",
+                "justusadam.language-haskell"
             ]
         }
     },
+    "mounts": [
+        "source=vscode-server-cache.rollends.research-container.v2.2,target=/home/.vscode-server,type=volume",
+        "source=${localEnv:HOME}/.ssh/,target=/home/ubuntu/.ssh/,type=bind,readonly",
+        "source=${localEnv:HOME}/.gnupg/,target=/home/ubuntu/.gnupg/,type=bind"
+    ],
     "forwardPorts": [8081],
     "postStartCommand": [
-        "/root/miniforge3/bin/conda", "run", "--live-stream", "-n", "sage", "/bin/bash", "-c",
-        "{ nohup python3 -m http.server -d /workspaces/dfl/docs/build/html/ 8081 > /dev/null & disown %1; }"
-    ]
+        "/home/ubuntu/miniforge3/bin/conda", "run", "--live-stream", "-n", "sage", "/bin/bash", "-c",
+        "{ nohup python3 -m http.server -d /home/ubuntu/workspace/deds/docs/build/html/ 8081 > /dev/null & disown %1; }"
+    ],
+    "containerUser": "ubuntu",
+    "remoteUser": "ubuntu",
+    "updateRemoteUserUID": true,
+    "workspaceMount": "source=${localWorkspaceFolder},target=/home/ubuntu/workspace/deds,type=bind",
+    "workspaceFolder": "/home/ubuntu/workspace/deds"
 }
