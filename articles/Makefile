@@ -1,5 +1,5 @@
 BUILDDIRECTORY := .build
-DOCUMENTS      := dfl-conf-paper.pdf dfl-conf-paper-slides.pdf
+DOCUMENTS      := dfl-conf-paper.pdf dfl-conf-paper-slides.pdf dfl-paper.pdf
 TEX_OPTIONS    := -no-shell-escape -interaction=nonstopmode -file-line-error -halt-on-error
 PDFLATEX       := pdflatex $(TEX_OPTIONS)
 XELATEX        := xelatex $(TEX_OPTIONS)
@@ -39,6 +39,21 @@ $(DFLCONFPAPER_SLIDES): $(DFLCONFPAPERSOURCE_SLIDES) $(DFLCONFPAPERDEPENDS_SLIDE
 	cd $(BUILDDIRECTORY)/$@/ && $(TEXFOT) $(XELATEX) -jobname=$(basename $@) root.tex
 	cd $(BUILDDIRECTORY)/$@/ && $(TEXFOT) $(XELATEX) -jobname=$(basename $@) root.tex
 	cp $(BUILDDIRECTORY)/$@/$@ $@
+
+DFLPAPER 		:= dfl-paper.pdf
+DFLPAPERSOURCE  := dfl-paper.tex
+DFLPAPERDEPENDS := siamart251216.cls figures.sty notation.sty
+$(DFLPAPER): $(DFLPAPERSOURCE) $(DFLPAPERDEPENDS)
+	mkdir -p $(BUILDDIRECTORY)/$@/
+	cp $^ $(BUILDDIRECTORY)/$@/
+	mv $(BUILDDIRECTORY)/$@/$(DFLPAPERSOURCE) $(BUILDDIRECTORY)/$@/root.tex
+	cd $(BUILDDIRECTORY)/$@/ && $(TEXFOT) $(PDFLATEX) -jobname=$(basename $@) root.tex
+# 	cd $(BUILDDIRECTORY)/$@/ && $(BIBTEX) $(basename $@)
+	cd $(BUILDDIRECTORY)/$@/ && $(TEXFOT) $(PDFLATEX) -jobname=$(basename $@) root.tex
+	cd $(BUILDDIRECTORY)/$@/ && $(TEXFOT) $(PDFLATEX) -jobname=$(basename $@) root.tex
+	cd $(BUILDDIRECTORY)/$@/ && $(TEXFOT) $(PDFLATEX) -jobname=$(basename $@) root.tex
+	cp $(BUILDDIRECTORY)/$@/$@ $@
+
 
 figures/%.png: figures/%.gif figures/%.gif.frame
 	convert figures/$*.gif -coalesce \( -clone $(shell cat figures/$*.gif.frame) -write $@ \) null:

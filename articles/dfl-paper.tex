@@ -1,211 +1,108 @@
-\documentclass[twocolumn, amsthm]{autart}
-\usepackage[T1]{fontenc}
+\documentclass[review,hidelinks,onefignum,onetabnum]{siamart251216}
+\ifpdf
 \pdfobjcompresslevel=0
 \pdfminorversion=4
+\hypersetup{
+  pdftitle={A Dynamic Program for Dynamic Feedback Linearization},
+  pdfauthor={R. S. D'Souza}
+}
+\fi
 
+\usepackage[T1]{fontenc}
 \usepackage{notation}
-\newcommand{\defining}[1]{\textbf{#1}}
+
 
 \begin{document}
 
-\begin{frontmatter}
-\runtitle{Dynamic Search for Dynamic Extension}
-\title{The Dynamic Search for the Minimal Dynamic Extension}
+\title{A Dynamic Program for Dynamic Feedback Linearization}
 
-\thanks[footnoteinfo]{This paper was not presented at any IFAC 
-meeting. Corresponding author R.~S.~D'Souza.}
-
-\author[RSD]{Rollen S. D'Souza}\ead{rollen.dsouza@uwaterloo.ca}
-
-\address[RSD]{Mississauga, ON, Canada}
-          
-\begin{keyword}                           % Five to ten keywords,  
-Cicero; Catiline; orations.               % chosen from the IFAC 
-\end{keyword}                             % keyword list or with the 
-                                          % help of the Automatica 
-                                          % keyword wizard
-
+\maketitle
 
 \begin{abstract}
   For nonlinear control systems, transformation into a linear control system via feedback linearization is one o
   Of course, the method itself only applies to a small class of nonlinear systems, 
 \end{abstract}
 
-\end{frontmatter}
+% REQUIRED
+\begin{keywords}
+example, \LaTeX
+\end{keywords}
+
+% REQUIRED
+\begin{MSCcodes}
+68Q25, 68R10, 68U05
+\end{MSCcodes}
 
 \section{Introduction}
-Video, patres conscripti, in me omnium vestrum ora atque oculos esse 
-conversos, video vos non solunn de vestro ac rei publicae, verum 
-etiam, si id depulsum sit, de meo periculo esse sollicitos. Est mihi 
-iucunda in malis et grata in dolore vestra erga me voluntas, sed eam, 
-per deos inmortales, deponite atque obliti salutis meae de vobis ac 
-de vestris liberis cogitate. Mihi si haec condicio consulatus data 
-est, ut omnis acerbitates, onunis dolores cruciatusque perferrem, 
-feram non solum fortiter, verum etiam lubenter, dum modo meis 
-laboribus vobis populoque Romano dignitas salusque pariatur.
 
 \section{Background}
 
 \subsection{Notation}
 % Must define the dimension of a graded subalgebra that is simply, finitely generated.
-\(\Manifold{M}\)
-\(\OpenSet{U}\)
-\(\TangentSpace{M}{p_0}\)
-\(\CotangentSpace{M}{p_0}\)
-\(\SmoothVectorFields{M}\)
-\(\SmoothForms{M}\)
-\(\VectorSpace{V}_k\)
-\(\Algebra{X}_1\)
-
-\subsection{Categories}
-
-\subsection{Dynamic Feedback Linearization}
 
 \subsection{The Derived Flag}
 
-\section{Main Statement}
+\subsection{Dynamic Feedback Linearization}
+Specific statement of the problem.
 
-\subsection{The Integrability Defect Index}
+\subsection{Categories}
+Objects \& Arrows. Primitive arrows. Functors. 2-Categories. Whiskering.
 
-\subsection{The Proposed Algorithm}
+\subsection{Dynamic Programs}
+Optimization Category. Loss Category. Bellman's Optimality Principle. Functoriality implies the optimality principle via whiskering.
 
-\section{The Hitting Graded Subalgebra Problem}
-The integrability defect index reduction step --- defect reduction step, in short --- drives the dynamic search for a minimal dynamic extension.
-The search algorithm seeks for what this article terms the ``hitting graded subalgebra'' to a list of graded algebras.
-The name comes from a related problem known as that ``hitting subset problem'' which has more recently been further extended to the hitting subspace problem.
-These problems ask to find the minimal subset (subspace) such that the intersection with every subset (subspace) in the list is non-trivial.
-Both problems are known to be NP-Hard.
+\section{Algorithm Preliminaries}
 
-The defect reduction step asks slightly more than that traditional hitting problem does.
-However, to ease demonstration, we first present a solution to the hitting graded subsalgebra problem and then adjust it to the requirements for defect reduction.
+\subsection{The Extension System Optimization Category}
+Define the notion of extension systems.
+Discuss the class of \emph{symbolic} extension systems that characterize a family of extension systems.
+Define the category of extension systems from a system.
+Show it is a category where all arrows decompose.
+Draw a picture of the category.
+The search must be done over a forest of infinitely many trees, with infinitely many branches bound by canopy determined by the Guay bound.
+This infinite search space is wrangled into a finite search by using the heuristic and an equivalence condition.
 
-\subsection{Problem Statement}
-Fix \(k \geq 1.\) 
-Let \(\Algebra{X}\) be a simply, finitely-generated graded algebra, and let \(\Algebra{X}_1,\) \(\ldots,\) \(\Algebra{X}_k \subseteq \Algebra{X}\) be a sequence of simply, finitely-generated graded subalgebras.
-The hitting graded subalgebra problem is as follows.
+\subsection{The Leading Integrability Defect Heuristic}
+Define the leading integrability defect.
+Prove it is a lower-bound on the change in dimension to the linearized system.
+Thus we establish the category of systems where the heuristic is the valid estimator:
+any dynamically feedback linearized system necessarily takes as many steps as the heuristic suggests (possibly more, though).
+That is, the heuristic being minimized is a necessary condition for dynamic feedback linearizability.
+Point out that the heuristic is (obviously) not the optimal estimator.
+Had it been so, a greedy algorithm for dynamic feedback linearization immediately follows.
+
+\begin{lemma}
+  If a system is dynamically feedback linearizable, then the leading integrability defect is resolvable through the linearization.
+\end{lemma}
+\begin{proof}
+  \textbf{TBD.}
+  If it is dynamically feedback linearizable via an extension system, then pick said arrow.
+  Argue that the pullback of any defective ideal is now contained in a differentially closed ideal.
+  Use this to assert that the required extensions must occur.
+\end{proof}
 %
-\begin{prob}[Hitting Graded Subalgebra]
-  \label{prob:HSAP}
-  A simply, finitely-generated, graded subalgebra \(\Algebra{X}_\star \subseteq \Algebra{X}\) is said to be a \defining{hitting graded subalgebra} to \(\{\Algebra{X}_1,\) \(\ldots,\) \(\Algebra{X}_k\}\) if it is the smallest (in dimension\footnote{Well-defined since we only consider simply, finitely-generated subalgebras as candidate solutions.}) subalgebra that has a non-trivial intersection with every graded subalgebra \(\Algebra{X}_j\) in the sequence.
-\end{prob}
-
-When \(X_1 \cap \cdots \cap X_k\) has dimension greater than zero,
-any one-dimensional subalgebra of the intersection is a hitting graded subalgebra.
-In general, a hitting graded subalgebra \(Y\) solves the problem,
+The leading integrability defect heuristic is the loss-realization of this necessary condition with the caveat that a system that is not dynamically feedback linearizable has an ``infinite'' cost-to-come.
+Admissability of this heuristic directly follows.
 %
-\begin{equation}
-  \begin{array}{cc}
-    {\displaystyle \min_{Y \subseteq X}{}} & \Dimension(Y)\\
-    \mathrm{s.t.}
-      &  \Dimension(Y \cap X_1) \geq 1\\
-      &  \vdots\\
-      &  \Dimension(Y \cap X_k) \geq 1\\
-  \end{array}
-\end{equation}
-%
-There is no unique solution to this problem in general.
-For instance, if \(X_1 \cap \cdots \cap X_k\) has dimension greater than one, then there exists infinitely many solutions.
-However, there always exists a solution when all the subalgebras are non-trivial.
-%
-\begin{lem}
-  Problem~\ref{prob:HSAP} has at least one solution if, and only if, \(\Dimension(X_i) \neq 0\) for all \(1 \leq i \leq k.\) \hfill
-\end{lem}
+\begin{corollary}
+  The leading integrability defect heuristic is admissable.
+\end{corollary}
 
-Constructing solutions to Problem~\ref{prob:HSAP} is not trivial.
-The problem is inherently combinatorial when the intersection of all the subalgebras is trivial.
-This can be explicitly shown as Problem~\ref{prob:HSAP} is reducible to the hitting subset problem in a manner akin to the hitting subspace problem.
-%
-\begin{thm}
-  \label{thm:nphard}
-  Problem~\ref{prob:HSAP} is NP-Hard.
-\end{thm}
-%
-Theorem~\ref{thm:nphard} suggests the problem can be solved with any practically-efficient algorithm used for NP-Hard problems such as Branch-and-Bound.
-Unfortunately, it is not that simple.
+Discuss how we can characterize the class of extension systems that determine different integral values of the heuristic as symbolic extension system.
+We can thus build a \emph{quotient} category where a bunch of objects (and the relevant arrows) are mapped to a single object based on the heuristic values.
+Must cover the fact that the input and state size \emph{but} is not relevant since it is all exact and the defect still is reduced.
+This renders the search into a finite categorical search.
+Cover formalities regarding the if, and only if, relationship between the existence of a dynamically feedback linearizable system in the extension class and the dynamic feedback linearizability of the symbolic extension system.
 
-Problem~\ref{prob:HSAP} is written in a manner akin to the hitting subset and subspace problems.
-\emph{Any} of the minimal size solutions are valid.
-Recall that there is usually no unique solution.
-However, this problem arises in the context of the defect reduction step which is executed iteratively on the defective ideals;
-it is not readily apparent that the choice of which generators to dynamically extend matters or not for future defect reduction steps!
-In fact, it is the case that a poor choice amongst the minimal choices of defect reduction leads to an overall non-minimal dynamic extension for the whole system.
-
-In light of this, we now present a dynamic programming approach to generating multiple solutions to Problem~\ref{prob:HSAP}.
-Later, Section~\ref{DP-DFL} extends this dynamic algorithm to solve the larger problem of the minimal dynamic extension.
-
-\subsection{The Principle of Optimality}
-
-
-\subsection{The Dynamic Search for the Hitting Graded Subalgebras}
-
-
-\section{The Defect Reduction Step}
-
-
-\section{The Dynamic Search for the Minimal Dynamic Extension}
-\label{sec:DP-DFL}
-
+\section{The Algorithm}
+Write out the algorithm as the development of symbolic conditions for defect resolution.
+Must prove the algorithm is terminating under any of the following conditions: (1) feedback linearizable system found, (2) a defect was found that was unresolvable or (3) all branches were explored with unresolvable defects to the search canopy defined by Guay.
 
 \section{Discussion}
-
-
-\begin{figure}
-\begin{center}
-% \includegraphics[height=4cm]{jcaesar.eps}    % The printed column  
-\caption{Gaius Julius Caesar, 100--44 B.C.}  % width is 8.4 cm.
-\label{fig1}                                 % Size the figures 
-\end{center}                                 % accordingly.
-\end{figure}
-
-% OR
-
-%\begin{figure}
-%\begin{center}
-%\epsfig{file=jcaesar,width=7cm}
-%\caption{Gaius Julius Caesar, 100--44 B.C.}
-%\label{fig1}
-%\end{center}
-%\end{figure}
-
-
-\subsection{A subsection}
-Marcus Tullius Cicero, 106--43 B.C. was a Roman statesman, orator, 
-and philosopher.  A major figure in the last years of the Republic, 
-he is best known for his orations against Catiline\footnote{
-This footnote should be very brief.}
-and for his mastery of Latin prose \cite{Heritage:92}. He was a 
-contemporary of Julius Caesar (Fig.~\ref{fig1}).
-
-\section{The argument}
-Some words might be appropriate describing equation~(\ref{e1}), if 
-we had but time and space enough.
-\begin{equation} \label{e1}
-{{\partial F}\over {\partial t}} =
-D{{\partial^2 F}\over {\partial x^2}}.
-\end{equation}
-See \cite{Abl:56}, \cite{AbTaRu:54}, \cite{Keo:58} and 
-\cite{Pow:85}.
-This equation goes far beyond the celebrated theorem ascribed to the great
-Pythagoras by his followers.
-\begin{thm}
-The square of the length of the hypotenuse of a right triangle equals the sum of the squares 
-of the lengths of the other two sides.
-\end{thm}
-\section{Epilogue}
-A word or two to conclude, and this even includes some inline 
-maths:  $R(x,t)\sim t^{-\beta}g(x/t^\alpha)\exp(-|x|/t^\alpha)$.
-
-\begin{ack}
-Partially supported by the Roman Senate.
-\end{ack}
-
-% \bibliographystyle{plain}        % Include this if you use bibtex 
-% \bibliography{autosam}           % and a bib file to produce the 
-%                                  % bibliography (preferred). The
-%                                  % correct style is generated by
-%                                  % Elsevier at the time of printing.
+dfsdfsfd
 
 \appendix
-\section{A summary of Latin grammar}
-\section{Some Latin vocabulary} 
+\section{Proof A}
+
+
 \end{document}
